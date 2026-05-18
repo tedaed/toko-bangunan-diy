@@ -8,7 +8,7 @@
 
 <div class="bg-blue-600 text-white p-10 text-center">
     <h1 class="text-4xl font-bold">
-        DIY Bangunan untuk Pemula
+        DIY Bangunan by Toko Anugrah Jaya
     </h1>
 
     <p class="mt-4">

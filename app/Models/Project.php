@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Product;
 
 class Project extends Model
 {
@@ -13,10 +12,8 @@ class Project extends Model
         'image'
     ];
 
-    public function products()
+    public function recipes()
     {
-       return $this->belongsToMany(Product::class, 'project_product')
-            ->withPivot('quantity')
-            ->withTimestamps();
+        return $this->hasMany(DiyRecipe::class);
     }
 }

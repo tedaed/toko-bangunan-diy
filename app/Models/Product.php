@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Project;
 
 class Product extends Model
 {
     protected $fillable = [
         'name',
         'category',
+        'specification',
         'price',
         'stock',
         'unit',
@@ -17,10 +17,8 @@ class Product extends Model
         'image'
     ];
 
-    public function projects()
+    public function componentOptions()
     {
-        return $this->belongsToMany(Project::class, 'project_product')
-            ->withPivot('quantity')
-            ->withTimestamps();
+        return $this->hasMany(DiyComponentOption::class);
     }
 }
