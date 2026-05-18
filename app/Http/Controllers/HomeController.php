@@ -8,14 +8,8 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $projects = Project::all();
+        $projects = Project::withCount('recipes')->get();
 
         return view('home', compact('projects'));
-    }
-    public function show($id)
-    {
-        $project = Project::with('products')->findOrFail($id);
-
-        return view('project-detail', compact('project'));
     }
 }
