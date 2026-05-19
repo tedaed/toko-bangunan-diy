@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\DiyRecipeController;
 use App\Http\Controllers\Admin\DiyRecipeComponentController;
 use App\Http\Controllers\Admin\DiyComponentOptionController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Admin\OrderController;
 
 
 
@@ -18,6 +19,8 @@ Route::get('/diy-projects', [DiyController::class, 'index'])->name('diy.index');
 Route::get('/diy-projects/{project}', [DiyController::class, 'showProject'])->name('diy.project');
 Route::get('/diy-recipes/{recipe}', [DiyController::class, 'showRecipe'])->name('diy.recipe');
 Route::post('/diy-recipes/{recipe}/calculate', [DiyController::class, 'calculate'])->name('diy.calculate');
+
+//Admin Area
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
     ->name('admin.dashboard');
 Route::resource('/admin/products', ProductController::class)
@@ -37,7 +40,7 @@ Route::post('/admin/recipe-components/{component}/options', [DiyComponentOptionC
 Route::delete('/admin/component-options/{option}', [DiyComponentOptionController::class, 'destroy'])
     ->name('admin.component-options.destroy');
 
-    //Checkout
+//Checkout
 Route::get('/checkout', [CheckoutController::class, 'create'])
     ->name('checkout.create');
 
@@ -46,3 +49,13 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
 
 Route::get('/invoice/{order}', [CheckoutController::class, 'invoice'])
     ->name('checkout.invoice');
+
+//Admin Order
+Route::get('/admin/orders', [OrderController::class, 'index'])
+    ->name('admin.orders.index');
+
+Route::get('/admin/orders/{order}', [OrderController::class, 'show'])
+    ->name('admin.orders.show');
+
+Route::patch('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])
+    ->name('admin.orders.update-status');

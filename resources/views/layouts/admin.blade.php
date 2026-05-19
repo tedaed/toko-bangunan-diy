@@ -39,7 +39,9 @@
                     Resep DIY
                 </a>
 
-                <a href="#" class="block px-4 py-3 rounded hover:bg-gray-800">
+                <a href="{{ route('admin.orders.index') }}"
+                    class="block px-4 py-3 rounded font-semibold
+   {{ request()->routeIs('admin.orders.*') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
                     Pesanan
                 </a>
 

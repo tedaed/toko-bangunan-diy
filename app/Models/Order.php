@@ -13,7 +13,11 @@ class Order extends Model
         'payment_method',
         'total_price',
         'status',
+        'stock_reduced_at',
         'note'
+    ];
+    protected $casts = [
+        'stock_reduced_at' => 'datetime',
     ];
 
     public function items()
