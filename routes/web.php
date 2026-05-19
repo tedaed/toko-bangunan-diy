@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\DiyRecipeComponentController;
 use App\Http\Controllers\Admin\DiyComponentOptionController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\CustomRequestController;
 
 
 
@@ -59,3 +60,14 @@ Route::get('/admin/orders/{order}', [OrderController::class, 'show'])
 
 Route::patch('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])
     ->name('admin.orders.update-status');
+
+
+//Custom Req Model
+Route::get('/custom-request', [CustomRequestController::class, 'create'])
+    ->name('custom-requests.create');
+
+Route::post('/custom-request', [CustomRequestController::class, 'store'])
+    ->name('custom-requests.store');
+
+Route::get('/custom-request/success/{customRequest}', [CustomRequestController::class, 'success'])
+    ->name('custom-requests.success');    

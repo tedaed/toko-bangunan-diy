@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Toko Bangunan XYZ')</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="min-h-screen bg-gray-100 text-gray-800 flex flex-col">
 
     <!-- NAVBAR -->
@@ -36,7 +38,7 @@
                     Katalog Produk
                 </a>
 
-                <a href="#" class="hover:text-blue-600">
+                <a href="{{ route('custom-requests.create') }}" class="hover:text-blue-600">
                     Permintaan Custom
                 </a>
 
@@ -47,8 +49,7 @@
 
             <!-- BUTTON -->
             <div>
-                <a href="#"
-                   class="bg-blue-600 text-white px-5 py-2 rounded font-semibold hover:bg-blue-700">
+                <a href="#" class="bg-blue-600 text-white px-5 py-2 rounded font-semibold hover:bg-blue-700">
                     Login
                 </a>
             </div>
@@ -57,8 +58,8 @@
     </nav>
 
     <!-- CONTENT -->
-   <main class="flex-1">
-    @yield('content')
+    <main class="flex-1">
+        @yield('content')
     </main>
 
     <!-- FOOTER -->
@@ -74,4 +75,5 @@
     </footer>
 
 </body>
+
 </html>
