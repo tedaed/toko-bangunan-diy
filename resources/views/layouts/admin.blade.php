@@ -23,10 +23,10 @@
                 Dashboard
             </a>
 
-            <a href="#"
-               class="block px-4 py-3 rounded hover:bg-gray-800">
+            <a href="{{ route('admin.products.index') }}"
+                class="block px-4 py-3 rounded hover:bg-gray-800">
                 Produk
-            </a>
+                </a>
 
             <a href="#"
                class="block px-4 py-3 rounded hover:bg-gray-800">
