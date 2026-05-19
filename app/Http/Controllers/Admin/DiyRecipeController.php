@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\DiyRecipe;
 use App\Models\Project;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class DiyRecipeController extends Controller
@@ -77,5 +78,13 @@ class DiyRecipeController extends Controller
         return redirect()
             ->route('admin.recipes.index')
             ->with('success', 'Resep DIY berhasil dihapus.');
+    }
+    public function show(DiyRecipe $recipe)
+    {
+        $recipe->load('project', 'components.options.product');
+
+        $products = Product::orderBy('name')->get();
+
+        return view('admin.recipes.show', compact('recipe', 'products'));
     }
 }
