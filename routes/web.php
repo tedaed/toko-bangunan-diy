@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DiyComponentOptionController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\CustomRequestController;
+use App\Http\Controllers\Admin\CustomRequestController as AdminCustomRequestController;
 
 
 
@@ -70,4 +71,15 @@ Route::post('/custom-request', [CustomRequestController::class, 'store'])
     ->name('custom-requests.store');
 
 Route::get('/custom-request/success/{customRequest}', [CustomRequestController::class, 'success'])
-    ->name('custom-requests.success');    
+    ->name('custom-requests.success');
+
+
+//Admin - Custom Request Controller
+Route::get('/admin/custom-requests', [AdminCustomRequestController::class, 'index'])
+    ->name('admin.custom-requests.index');
+
+Route::get('/admin/custom-requests/{customRequest}', [AdminCustomRequestController::class, 'show'])
+    ->name('admin.custom-requests.show');
+
+Route::patch('/admin/custom-requests/{customRequest}/status', [AdminCustomRequestController::class, 'updateStatus'])
+    ->name('admin.custom-requests.update-status');
