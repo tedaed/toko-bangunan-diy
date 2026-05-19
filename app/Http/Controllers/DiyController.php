@@ -42,6 +42,7 @@ class DiyController extends Controller
             ->keyBy('id');
 
         $items = [];
+        $checkoutItems = [];
         $total = 0;
 
         foreach ($selectedComponents as $componentId => $data) {
@@ -69,8 +70,17 @@ class DiyController extends Controller
                 'subtotal' => $subtotal,
                 'stock_enough' => $product->stock >= $quantity,
             ];
+            $checkoutItems[] = [
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+            ];
         }
-
+        session([
+            'checkout' => [
+                'recipe_id' => $recipe->id,
+                'items' => $checkoutItems,
+            ]
+        ]);
         return view('diy.result', compact('recipe', 'items', 'total'));
     }
 }

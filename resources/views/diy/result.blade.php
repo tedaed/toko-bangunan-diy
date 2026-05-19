@@ -1,24 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hasil Estimasi</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+@extends('layouts.customer')
 
-<div class="bg-blue-600 text-white p-10 text-center">
+@section('title', 'Hasil Estimasi')
+
+@section('content')
+
+<div class="bg-blue-600 text-white py-16 text-center">
     <h1 class="text-4xl font-bold">Hasil Estimasi</h1>
     <p class="mt-4">{{ $recipe->name }}</p>
 </div>
 
-<div class="p-10">
-    <div class="bg-white rounded shadow p-6 max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto px-6 py-10">
+    <div class="bg-white rounded-xl shadow p-6">
 
         <h2 class="text-2xl font-bold mb-6">Rincian Belanja</h2>
 
         @if (count($items) == 0)
+
             <p class="text-gray-600">Belum ada komponen yang dipilih.</p>
+
         @else
+
             <div class="space-y-4">
                 @foreach ($items as $item)
                     <div class="border rounded p-4">
@@ -68,15 +69,22 @@
                     Rp {{ number_format($total, 0, ',', '.') }}
                 </h2>
             </div>
-        @endif
 
-        <a href="{{ route('diy.recipe', $recipe->id) }}"
-           class="inline-block mt-6 bg-gray-600 text-white px-4 py-2 rounded">
-            Kembali Ubah Pilihan
-        </a>
+            <div class="mt-6 flex gap-3">
+                <a href="{{ route('checkout.create') }}"
+                   class="inline-block bg-green-600 text-white px-6 py-3 rounded font-bold hover:bg-green-700">
+                    Lanjut Checkout
+                </a>
+
+                <a href="{{ route('diy.recipe', $recipe->id) }}"
+                   class="inline-block bg-gray-600 text-white px-6 py-3 rounded font-bold hover:bg-gray-700">
+                    Kembali Ubah Pilihan
+                </a>
+            </div>
+
+        @endif
 
     </div>
 </div>
 
-</body>
-</html>
+@endsection

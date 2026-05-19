@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\DiyRecipeController;
 use App\Http\Controllers\Admin\DiyRecipeComponentController;
 use App\Http\Controllers\Admin\DiyComponentOptionController;
-
+use App\Http\Controllers\CheckoutController;
 
 
 
@@ -24,10 +24,10 @@ Route::resource('/admin/products', ProductController::class)
     ->names('admin.products');
 Route::resource('/admin/recipes', DiyRecipeController::class)
     ->names('admin.recipes');
-    Route::post('/admin/recipes/{recipe}/components', [DiyRecipeComponentController::class, 'store'])
+Route::post('/admin/recipes/{recipe}/components', [DiyRecipeComponentController::class, 'store'])
     ->name('admin.recipe-components.store');
 
-    #Bagian Kelola Komponen
+#Bagian Kelola Komponen
 Route::delete('/admin/recipe-components/{component}', [DiyRecipeComponentController::class, 'destroy'])
     ->name('admin.recipe-components.destroy');
 
@@ -36,3 +36,13 @@ Route::post('/admin/recipe-components/{component}/options', [DiyComponentOptionC
 
 Route::delete('/admin/component-options/{option}', [DiyComponentOptionController::class, 'destroy'])
     ->name('admin.component-options.destroy');
+
+    //Checkout
+Route::get('/checkout', [CheckoutController::class, 'create'])
+    ->name('checkout.create');
+
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->name('checkout.store');
+
+Route::get('/invoice/{order}', [CheckoutController::class, 'invoice'])
+    ->name('checkout.invoice');
