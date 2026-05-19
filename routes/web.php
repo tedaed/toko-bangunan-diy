@@ -12,7 +12,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\CustomRequestController;
 use App\Http\Controllers\Admin\CustomRequestController as AdminCustomRequestController;
-
+use App\Http\Controllers\Admin\PosController;
 
 
 Route::get('/', [HomeController::class, 'index']);
@@ -83,3 +83,10 @@ Route::get('/admin/custom-requests/{customRequest}', [AdminCustomRequestControll
 
 Route::patch('/admin/custom-requests/{customRequest}/status', [AdminCustomRequestController::class, 'updateStatus'])
     ->name('admin.custom-requests.update-status');
+
+//Admin - Pos Controller
+Route::get('/admin/pos', [PosController::class, 'index'])
+    ->name('admin.pos.index');
+
+Route::post('/admin/pos', [PosController::class, 'store'])
+    ->name('admin.pos.store');
