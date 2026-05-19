@@ -13,7 +13,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\CustomRequestController;
 use App\Http\Controllers\Admin\CustomRequestController as AdminCustomRequestController;
 use App\Http\Controllers\Admin\PosController;
-
+use App\Http\Controllers\Admin\ReportController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/projects/{id}', [HomeController::class, 'show']);
@@ -90,3 +90,7 @@ Route::get('/admin/pos', [PosController::class, 'index'])
 
 Route::post('/admin/pos', [PosController::class, 'store'])
     ->name('admin.pos.store');
+
+//Report Penjualan
+    Route::get('/admin/reports/sales', [ReportController::class, 'sales'])
+    ->name('admin.reports.sales');
