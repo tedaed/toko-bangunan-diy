@@ -5,7 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DiyController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ProductController;
-
+use App\Http\Controllers\Admin\DiyRecipeController;
 
 
 
@@ -20,3 +20,5 @@ Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
     ->name('admin.dashboard');
 Route::resource('/admin/products', ProductController::class)
     ->names('admin.products');
+Route::resource('/admin/recipes', DiyRecipeController::class)
+    ->names('admin.recipes');
