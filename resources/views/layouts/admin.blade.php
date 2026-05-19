@@ -20,15 +20,22 @@
             </div>
 
             <nav class="p-4 space-y-2">
-                <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 rounded bg-blue-600 font-semibold">
+
+                <a href="{{ route('admin.dashboard') }}"
+                    class="block px-4 py-3 rounded font-semibold
+       {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
                     Dashboard
                 </a>
 
-                <a href="{{ route('admin.products.index') }}" class="block px-4 py-3 rounded hover:bg-gray-800">
+                <a href="{{ route('admin.products.index') }}"
+                    class="block px-4 py-3 rounded font-semibold
+       {{ request()->routeIs('admin.products.*') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
                     Produk
                 </a>
 
-                <a href="{{ route('admin.recipes.index') }}" class="block px-4 py-3 rounded hover:bg-gray-800">
+                <a href="{{ route('admin.recipes.index') }}"
+                    class="block px-4 py-3 rounded font-semibold
+       {{ request()->routeIs('admin.recipes.*') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
                     Resep DIY
                 </a>
 
@@ -47,6 +54,7 @@
                 <a href="#" class="block px-4 py-3 rounded hover:bg-gray-800">
                     Laporan Penjualan
                 </a>
+
             </nav>
         </aside>
 
