@@ -27,6 +27,46 @@
         </div>
     @endif
 
+    {{-- SEARCH & FILTER --}}
+    <form method="GET" action="{{ route('admin.products.index') }}"
+          class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+        <div class="md:col-span-2">
+            <label class="block font-semibold mb-1">Cari Produk</label>
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
+                   class="w-full border rounded p-2"
+                   placeholder="Cari nama, kategori, atau spesifikasi produk">
+        </div>
+
+        <div>
+            <label class="block font-semibold mb-1">Kategori</label>
+            <select name="category" class="w-full border rounded p-2">
+                <option value="">Semua Kategori</option>
+
+                @foreach ($categories as $category)
+                    <option value="{{ $category }}"
+                        {{ request('category') == $category ? 'selected' : '' }}>
+                        {{ $category }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="flex items-end gap-2">
+            <button type="submit"
+                    class="bg-blue-600 text-white px-4 py-2 rounded font-semibold hover:bg-blue-700">
+                Cari
+            </button>
+
+            <a href="{{ route('admin.products.index') }}"
+               class="bg-gray-600 text-white px-4 py-2 rounded">
+                Reset
+            </a>
+        </div>
+    </form>
+
     <div class="overflow-x-auto">
         <table class="w-full border-collapse">
             <thead>
@@ -40,6 +80,7 @@
                     <th class="p-3 border">Aksi</th>
                 </tr>
             </thead>
+
             <tbody>
                 @forelse($products as $product)
                     <tr>
@@ -103,6 +144,11 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    {{-- PAGINATION --}}
+    <div class="mt-6">
+        {{ $products->links() }}
     </div>
 
 </div>
