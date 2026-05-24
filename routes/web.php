@@ -3,46 +3,60 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\DiyController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomRequestController;
+
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\DiyRecipeController;
 use App\Http\Controllers\Admin\DiyRecipeComponentController;
 use App\Http\Controllers\Admin\DiyComponentOptionController;
-use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\OrderController;
-use App\Http\Controllers\CustomRequestController;
 use App\Http\Controllers\Admin\CustomRequestController as AdminCustomRequestController;
 use App\Http\Controllers\Admin\PosController;
 use App\Http\Controllers\Admin\ReportController;
 
-Route::get('/', [HomeController::class, 'index']);
-Route::get('/projects/{id}', [HomeController::class, 'show']);
-Route::get('/diy-projects', [DiyController::class, 'index'])->name('diy.index');
-Route::get('/diy-projects/{project}', [DiyController::class, 'showProject'])->name('diy.project');
-Route::get('/diy-recipes/{recipe}', [DiyController::class, 'showRecipe'])->name('diy.recipe');
-Route::post('/diy-recipes/{recipe}/calculate', [DiyController::class, 'calculate'])->name('diy.calculate');
+// =========================
+// PUBLIC / CUSTOMER AREA
+// =========================
 
-//Admin Area
-Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
-    ->name('admin.dashboard');
-Route::resource('/admin/products', ProductController::class)
-    ->names('admin.products');
-Route::resource('/admin/recipes', DiyRecipeController::class)
-    ->names('admin.recipes');
-Route::post('/admin/recipes/{recipe}/components', [DiyRecipeComponentController::class, 'store'])
-    ->name('admin.recipe-components.store');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-#Bagian Kelola Komponen
-Route::delete('/admin/recipe-components/{component}', [DiyRecipeComponentController::class, 'destroy'])
-    ->name('admin.recipe-components.destroy');
+// Kalau route lama ini sudah tidak dipakai, boleh comment/hapus.
+// Route::get('/projects/{id}', [HomeController::class, 'show']);
 
-Route::post('/admin/recipe-components/{component}/options', [DiyComponentOptionController::class, 'store'])
-    ->name('admin.component-options.store');
+Route::get('/diy-projects', [DiyController::class, 'index'])
+    ->name('diy.index');
 
-Route::delete('/admin/component-options/{option}', [DiyComponentOptionController::class, 'destroy'])
-    ->name('admin.component-options.destroy');
+Route::get('/diy-projects/{project}', [DiyController::class, 'showProject'])
+    ->name('diy.project');
 
-//Checkout
+Route::get('/diy-recipes/{recipe}', [DiyController::class, 'showRecipe'])
+    ->name('diy.recipe');
+
+Route::post('/diy-recipes/{recipe}/calculate', [DiyController::class, 'calculate'])
+    ->name('diy.calculate');
+
+
+// =========================
+// AUTH / LOGIN
+// =========================
+
+Route::get('/login', [AuthController::class, 'showLogin'])
+    ->name('login');
+
+Route::post('/login', [AuthController::class, 'login'])
+    ->name('login.process');
+
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
+
+
+// =========================
+// CHECKOUT CUSTOMER
+// =========================
+
 Route::get('/checkout', [CheckoutController::class, 'create'])
     ->name('checkout.create');
 
@@ -52,18 +66,11 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
 Route::get('/invoice/{order}', [CheckoutController::class, 'invoice'])
     ->name('checkout.invoice');
 
-//Admin Order
-Route::get('/admin/orders', [OrderController::class, 'index'])
-    ->name('admin.orders.index');
 
-Route::get('/admin/orders/{order}', [OrderController::class, 'show'])
-    ->name('admin.orders.show');
+// =========================
+// CUSTOM REQUEST CUSTOMER
+// =========================
 
-Route::patch('/admin/orders/{order}/status', [OrderController::class, 'updateStatus'])
-    ->name('admin.orders.update-status');
-
-
-//Custom Req Model
 Route::get('/custom-request', [CustomRequestController::class, 'create'])
     ->name('custom-requests.create');
 
@@ -74,23 +81,66 @@ Route::get('/custom-request/success/{customRequest}', [CustomRequestController::
     ->name('custom-requests.success');
 
 
-//Admin - Custom Request Controller
-Route::get('/admin/custom-requests', [AdminCustomRequestController::class, 'index'])
-    ->name('admin.custom-requests.index');
+// =========================
+// ADMIN AREA
+// Semua route di sini wajib login dan role admin
+// =========================
 
-Route::get('/admin/custom-requests/{customRequest}', [AdminCustomRequestController::class, 'show'])
-    ->name('admin.custom-requests.show');
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-Route::patch('/admin/custom-requests/{customRequest}/status', [AdminCustomRequestController::class, 'updateStatus'])
-    ->name('admin.custom-requests.update-status');
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])
+            ->name('dashboard');
 
-//Admin - Pos Controller
-Route::get('/admin/pos', [PosController::class, 'index'])
-    ->name('admin.pos.index');
+        Route::resource('/products', ProductController::class)
+            ->names('products');
 
-Route::post('/admin/pos', [PosController::class, 'store'])
-    ->name('admin.pos.store');
+        Route::resource('/recipes', DiyRecipeController::class)
+            ->names('recipes');
 
-//Report Penjualan
-    Route::get('/admin/reports/sales', [ReportController::class, 'sales'])
-    ->name('admin.reports.sales');
+        // Kelola komponen resep
+        Route::post('/recipes/{recipe}/components', [DiyRecipeComponentController::class, 'store'])
+            ->name('recipe-components.store');
+
+        Route::delete('/recipe-components/{component}', [DiyRecipeComponentController::class, 'destroy'])
+            ->name('recipe-components.destroy');
+
+        Route::post('/recipe-components/{component}/options', [DiyComponentOptionController::class, 'store'])
+            ->name('component-options.store');
+
+        Route::delete('/component-options/{option}', [DiyComponentOptionController::class, 'destroy'])
+            ->name('component-options.destroy');
+
+        // Pesanan
+        Route::get('/orders', [OrderController::class, 'index'])
+            ->name('orders.index');
+
+        Route::get('/orders/{order}', [OrderController::class, 'show'])
+            ->name('orders.show');
+
+        Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
+            ->name('orders.update-status');
+
+        // Permintaan custom admin
+        Route::get('/custom-requests', [AdminCustomRequestController::class, 'index'])
+            ->name('custom-requests.index');
+
+        Route::get('/custom-requests/{customRequest}', [AdminCustomRequestController::class, 'show'])
+            ->name('custom-requests.show');
+
+        Route::patch('/custom-requests/{customRequest}/status', [AdminCustomRequestController::class, 'updateStatus'])
+            ->name('custom-requests.update-status');
+
+        // POS Kasir
+        Route::get('/pos', [PosController::class, 'index'])
+            ->name('pos.index');
+
+        Route::post('/pos', [PosController::class, 'store'])
+            ->name('pos.store');
+
+        // Laporan Penjualan
+        Route::get('/reports/sales', [ReportController::class, 'sales'])
+            ->name('reports.sales');
+    });

@@ -49,9 +49,27 @@
 
             <!-- BUTTON -->
             <div>
-                <a href="#" class="bg-blue-600 text-white px-5 py-2 rounded font-semibold hover:bg-blue-700">
-                    Login
-                </a>
+                @auth
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-semibold">
+                            {{ Auth::user()->name }}
+                        </span>
+
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+
+                            <button type="submit"
+                                class="bg-gray-900 text-white px-5 py-2 rounded font-semibold hover:bg-gray-800">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="bg-blue-600 text-white px-5 py-2 rounded font-semibold hover:bg-blue-700">
+                        Login
+                    </a>
+                @endauth
             </div>
 
         </div>

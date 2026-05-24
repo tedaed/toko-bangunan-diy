@@ -51,17 +51,17 @@
                     Permintaan Custom
                 </a>
 
-              <a href="{{ route('admin.pos.index') }}"
-   class="block px-4 py-3 rounded font-semibold
+                <a href="{{ route('admin.pos.index') }}"
+                    class="block px-4 py-3 rounded font-semibold
    {{ request()->routeIs('admin.pos.*') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
-    POS Kasir
-</a>
+                    POS Kasir
+                </a>
 
                 <a href="{{ route('admin.reports.sales') }}"
-   class="block px-4 py-3 rounded font-semibold
+                    class="block px-4 py-3 rounded font-semibold
    {{ request()->routeIs('admin.reports.*') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
-    Laporan Penjualan
-</a>
+                    Laporan Penjualan
+                </a>
 
             </nav>
         </aside>
@@ -81,9 +81,14 @@
                         Lihat Website
                     </a>
 
-                    <button class="bg-gray-900 text-white px-4 py-2 rounded">
-                        Admin
-                    </button>
+                    {{-- Logout --}}
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+
+                        <button type="submit" class="bg-gray-900 text-white px-4 py-2 rounded">
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </header>
 
