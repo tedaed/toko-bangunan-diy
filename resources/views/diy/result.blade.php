@@ -68,15 +68,16 @@
                     </h2>
                 </div>
 
-                <div class="mt-6 flex gap-3">
-                    @php
-                        $hasStockIssue = collect($items)->contains(function ($item) {
-                            return !$item['stock_enough'];
-                        });
-                    @endphp
+                @php
+                    $hasStockIssue = collect($items)->contains(function ($item) {
+                        return !$item['stock_enough'];
+                    });
+                @endphp
+
+                <div class="mt-6 flex flex-wrap gap-3">
 
                     @if ($hasStockIssue)
-                        <div class="mt-6 bg-red-100 border border-red-300 text-red-700 p-4 rounded">
+                        <div class="w-full bg-red-100 border border-red-300 text-red-700 p-4 rounded">
                             <p class="font-bold">Checkout tidak dapat dilanjutkan.</p>
                             <p>
                                 Terdapat produk dengan stok kosong atau stok kurang dari jumlah yang Anda pilih.
@@ -85,17 +86,16 @@
                         </div>
                     @else
                         <a href="{{ route('checkout.create') }}"
-                            class="inline-block mt-6 bg-green-600 text-white px-6 py-3 rounded font-bold hover:bg-green-700">
+                            class="inline-flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded font-semibold hover:bg-green-700">
                             Lanjut Checkout
                         </a>
                     @endif
 
                     <a href="{{ route('diy.recipe', $recipe->id) }}"
-                        class="inline-block bg-gray-600 text-white px-6 py-3 rounded font-bold hover:bg-gray-700">
+                        class="inline-flex items-center justify-center bg-gray-600 text-white px-4 py-2 rounded font-semibold hover:bg-gray-700">
                         Kembali Ubah Pilihan
                     </a>
                 </div>
-
             @endif
 
         </div>

@@ -23,9 +23,15 @@ class DiyController extends Controller
         return view('diy.project', compact('project'));
     }
 
+    //Tampilin Komponen per Resep DIY
     public function showRecipe(DiyRecipe $recipe)
     {
-        $recipe->load('project', 'components.options.product');
+        $recipe->load([
+            'components' => function ($query) {
+                $query->whereHas('options')
+                    ->with('options.product');
+            }
+        ]);
 
         return view('diy.recipe', compact('recipe'));
     }

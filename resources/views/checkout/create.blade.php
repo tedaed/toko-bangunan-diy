@@ -29,7 +29,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <<label class="block font-semibold mb-1">
+                        <label class="block font-semibold mb-1">
                             Nomor WhatsApp <span class="text-red-600">*</span>
                             </label>
 

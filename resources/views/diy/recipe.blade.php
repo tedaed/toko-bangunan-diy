@@ -22,7 +22,10 @@
                 @csrf
 
                 <div class="space-y-6">
-                    @foreach ($recipe->components as $component)
+                    @forelse ($recipe->components as $component)
+
+                        @continue($component->options->isEmpty())
+
                         @php
                             $defaultOption =
                                 $component->options->where('is_default', true)->first() ?? $component->options->first();
@@ -76,7 +79,12 @@
                                 value="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}" min="1"
                                 class="w-full border rounded p-2">
                         </div>
-                    @endforeach
+
+                    @empty
+                        <div class="bg-yellow-100 text-yellow-700 p-4 rounded">
+                            Belum ada komponen produk yang tersedia untuk resep ini.
+                        </div>
+                    @endforelse
                 </div>
 
                 <button type="submit" class="mt-6 bg-green-600 text-white px-6 py-3 rounded font-bold">
