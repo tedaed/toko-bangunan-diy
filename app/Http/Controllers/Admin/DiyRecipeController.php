@@ -10,13 +10,29 @@ use Illuminate\Http\Request;
 
 class DiyRecipeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $recipes = DiyRecipe::with('project')
-            ->latest()
-            ->get();
+        $query = DiyRecipe::with('project');
 
-        return view('admin.recipes.index', compact('recipes'));
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('project_id')) {
+            $query->where('project_id', $request->project_id);
+        }
+
+        $recipes = $query->latest()
+            ->paginate(10)
+            ->withQueryString()
+            ->withPath(route('admin.recipes.index', [], false));
+
+        $projects = Project::orderBy('name')->get();
+
+        return view('admin.recipes.index', compact('recipes', 'projects'));
     }
 
     public function create()
