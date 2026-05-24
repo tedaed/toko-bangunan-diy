@@ -27,9 +27,21 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, Order $order)
     {
+        if ($order->status === 'closed') {
+            return redirect()
+                ->route('admin.orders.show', $order->id)
+                ->with('error', 'Pesanan sudah closed dan tidak dapat diubah lagi.');
+        }
+
         $validated = $request->validate([
-            'status' => 'required|in:pending,confirmed,completed,cancelled',
+            'status' => 'required|in:pending,confirmed,completed,closed,cancelled',
         ]);
+
+        if ($validated['status'] === 'closed' && $order->status !== 'completed') {
+            return redirect()
+                ->route('admin.orders.show', $order->id)
+                ->with('error', 'Pesanan hanya dapat diubah menjadi closed setelah status completed.');
+        }
 
         try {
             DB::transaction(function () use ($order, $validated) {

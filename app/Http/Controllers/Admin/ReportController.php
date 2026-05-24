@@ -11,7 +11,7 @@ class ReportController extends Controller
     public function sales(Request $request)
     {
         $query = Order::with('items')
-            ->whereIn('status', ['confirmed', 'completed']);
+            ->whereIn('status', ['confirmed', 'completed', 'closed']);
 
         if ($request->filled('start_date')) {
             $query->whereDate('created_at', '>=', $request->start_date);
