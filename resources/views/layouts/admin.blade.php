@@ -26,6 +26,11 @@
        {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
                     Dashboard
                 </a>
+                <a href="{{ route('admin.projects.index') }}"
+                    class="block px-4 py-3 rounded font-semibold
+   {{ request()->routeIs('admin.projects.*') ? 'bg-blue-600 text-white' : 'hover:bg-gray-800' }}">
+                    Project DIY
+                </a>
 
                 <a href="{{ route('admin.products.index') }}"
                     class="block px-4 py-3 rounded font-semibold

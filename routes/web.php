@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\CustomRequestController as AdminCustomRequestController;
 use App\Http\Controllers\Admin\PosController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 
 // =========================
 // PUBLIC / CUSTOMER AREA
@@ -111,6 +112,9 @@ Route::middleware(['auth', 'admin'])
         Route::get('/dashboard', [AdminController::class, 'dashboard'])
             ->name('dashboard');
 
+        Route::resource('/projects', AdminProjectController::class)
+            ->names('projects');    
+            
         Route::resource('/products', ProductController::class)
             ->names('products');
 
