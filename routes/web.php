@@ -6,6 +6,7 @@ use App\Http\Controllers\DiyController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomRequestController;
+use App\Http\Controllers\CustomerOrderController;
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ProductController;
@@ -23,11 +24,13 @@ use App\Http\Controllers\Admin\ReportController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// Kalau route lama ini sudah tidak dipakai, boleh comment/hapus.
 // Route::get('/projects/{id}', [HomeController::class, 'show']);
 
 Route::get('/diy-projects', [DiyController::class, 'index'])
     ->name('diy.index');
+
+Route::get('/catalog', [DiyController::class, 'index'])
+    ->name('catalog.index');
 
 Route::get('/diy-projects/{project}', [DiyController::class, 'showProject'])
     ->name('diy.project');
@@ -36,6 +39,7 @@ Route::get('/diy-recipes/{recipe}', [DiyController::class, 'showRecipe'])
     ->name('diy.recipe');
 
 Route::post('/diy-recipes/{recipe}/calculate', [DiyController::class, 'calculate'])
+    ->middleware('auth')
     ->name('diy.calculate');
 
 
@@ -79,6 +83,19 @@ Route::post('/custom-request', [CustomRequestController::class, 'store'])
 
 Route::get('/custom-request/success/{customRequest}', [CustomRequestController::class, 'success'])
     ->name('custom-requests.success');
+
+
+// =========================
+// CUSTOMER ORDERS / PESANAN SAYA
+// =========================
+
+Route::middleware('auth')->group(function () {
+    Route::get('/my-orders', [CustomerOrderController::class, 'index'])
+        ->name('customer.orders.index');
+
+    Route::get('/my-orders/{order}', [CustomerOrderController::class, 'show'])
+        ->name('customer.orders.show');
+});
 
 
 // =========================

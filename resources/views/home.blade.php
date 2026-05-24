@@ -13,9 +13,9 @@
         Temukan proyek DIY dan bahan yang dibutuhkan sesuai kebutuhan Anda
     </p>
 
-    <a href="{{ route('diy.index') }}"
+    <a href="{{ route('catalog.index') }}"
        class="inline-block mt-6 bg-white text-blue-600 px-6 py-3 rounded font-bold hover:bg-gray-100">
-        Mulai Panduan DIY
+        Lihat Katalog Produk
     </a>
 </div>
 

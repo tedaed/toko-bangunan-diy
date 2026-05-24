@@ -40,6 +40,29 @@ class CheckoutController extends Controller
             ];
         })->filter();
 
+        if ($items->isEmpty()) {
+            return redirect()
+                ->route('diy.index')
+                ->with('error', 'Item checkout tidak valid.');
+        }
+
+        // CEGAH USER MASUK CHECKOUT KALAU STOK KURANG / HABIS
+        $hasStockIssue = $items->contains(function ($item) {
+            return !$item['stock_enough'];
+        });
+
+        if ($hasStockIssue) {
+            if ($recipe) {
+                return redirect()
+                    ->route('diy.recipe', $recipe->id)
+                    ->with('error', 'Checkout tidak dapat dilanjutkan karena terdapat stok produk yang kurang atau habis.');
+            }
+
+            return redirect()
+                ->route('diy.index')
+                ->with('error', 'Checkout tidak dapat dilanjutkan karena terdapat stok produk yang kurang atau habis.');
+        }
+
         $total = $items->sum('subtotal');
 
         return view('checkout.create', compact('recipe', 'items', 'total'));
@@ -49,9 +72,14 @@ class CheckoutController extends Controller
     {
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
-            'phone' => 'required|string|max:30',
+            'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
             'payment_method' => 'required|string|max:50',
             'note' => 'nullable|string',
+        ], [
+            'customer_name.required' => 'Nama pelanggan wajib diisi.',
+            'phone.required' => 'Nomor WhatsApp wajib diisi.',
+            'phone.regex' => 'Nomor WhatsApp harus berupa angka 10 sampai 15 digit.',
+            'payment_method.required' => 'Metode pembayaran wajib dipilih.',
         ]);
 
         $checkout = session('checkout');
@@ -85,10 +113,20 @@ class CheckoutController extends Controller
                 ->with('error', 'Item checkout tidak valid.');
         }
 
+        // PROTEKSI BACKEND: CEGAH ORDER KALAU STOK KURANG / HABIS
+        foreach ($items as $item) {
+            if ($item['product']->stock < $item['quantity']) {
+                return redirect()
+                    ->route('checkout.create')
+                    ->with('error', 'Stok produk ' . $item['product']->name . ' - ' . $item['product']->specification . ' tidak mencukupi.');
+            }
+        }
+
         $total = $items->sum('subtotal');
 
         $order = DB::transaction(function () use ($validated, $items, $total) {
             $order = Order::create([
+                'user_id' => auth()->id(),
                 'invoice_number' => 'INV-' . now()->format('YmdHis'),
                 'customer_name' => $validated['customer_name'],
                 'phone' => $validated['phone'],

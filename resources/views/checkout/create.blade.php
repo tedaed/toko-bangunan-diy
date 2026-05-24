@@ -17,7 +17,9 @@
                     @csrf
 
                     <div class="mb-4">
-                        <label class="block font-semibold mb-1">Nama Pelanggan</label>
+                        <label class="block font-semibold mb-1">
+                            Nama Pelanggan <span class="text-red-600">*</span>
+                        </label>
                         <input type="text" name="customer_name" value="{{ old('customer_name') }}"
                             class="w-full border rounded p-2" placeholder="Masukkan nama lengkap">
 
@@ -27,17 +29,22 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="block font-semibold mb-1">Nomor WhatsApp</label>
-                        <input type="text" name="phone" value="{{ old('phone') }}" class="w-full border rounded p-2"
-                            placeholder="Contoh: 081234567890">
+                        <<label class="block font-semibold mb-1">
+                            Nomor WhatsApp <span class="text-red-600">*</span>
+                            </label>
 
-                        @error('phone')
-                            <p class="text-red-600 text-sm">{{ $message }}</p>
-                        @enderror
+                            <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="numeric"
+                                pattern="[0-9]{10,15}" class="w-full border rounded p-2" placeholder="Contoh: 081234567890">
+
+                            @error('phone')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label class="block font-semibold mb-1">Metode Pembayaran</label>
+                        <label class="block font-semibold mb-1">
+                            Metode Pembayaran <span class="text-red-600">*</span>
+                        </label>
                         <select name="payment_method" class="w-full border rounded p-2">
                             <option value="QRIS">QRIS</option>
                             <option value="Bayar di Toko">Bayar di Toko</option>

@@ -30,17 +30,19 @@
                     Beranda
                 </a>
 
-                <a href="{{ route('diy.index') }}" class="hover:text-blue-600">
-                    Panduan DIY
-                </a>
-
-                <a href="#" class="hover:text-blue-600">
+                <a href="{{ route('catalog.index') }}" class="hover:text-blue-600">
                     Katalog Produk
                 </a>
 
-                <a href="{{ route('custom-requests.create') }}" class="hover:text-blue-600">
+                <a href="{{ route('custom-requests.create', [], false) }}" class="hover:text-blue-600">
                     Permintaan Custom
                 </a>
+
+                @auth
+                    <a href="{{ route('customer.orders.index', [], false) }}" class="hover:text-blue-600">
+                        Pesanan Saya
+                    </a>
+                @endauth
 
                 <a href="#" class="hover:text-blue-600">
                     Tentang Toko

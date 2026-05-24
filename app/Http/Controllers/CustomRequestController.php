@@ -9,31 +9,35 @@ use Illuminate\Http\Request;
 class CustomRequestController extends Controller
 {
     public function create(Request $request)
-{
-    $projects = Project::all();
+    {
+        $projects = Project::all();
 
-    $selectedProjectId = $request->query('project_id');
+        $selectedProjectId = $request->query('project_id');
 
-    return view('custom_requests.create', compact('projects', 'selectedProjectId'));
-}
+        return view('custom_requests.create', compact('projects', 'selectedProjectId'));
+    }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-    'project_id' => 'nullable|exists:projects,id',
-    'customer_name' => 'required|string|max:255',
-    'phone' => 'required|string|max:30',
-    'length' => 'required|integer|min:1',
-    'width' => 'required|integer|min:1|lte:length',
-    'height' => 'nullable|integer|min:1',
-    'quality' => 'nullable|string|max:100',
-    'note' => 'required|string',
-], [
-    'length.required' => 'Panjang wajib diisi.',
-    'width.required' => 'Lebar wajib diisi.',
-    'width.lte' => 'Lebar tidak boleh lebih besar dari panjang.',
-    'note.required' => 'Catatan kebutuhan wajib diisi.',
-]);
+            'project_id' => 'nullable|exists:projects,id',
+            'customer_name' => 'required|string|max:255',
+            //Input No WA
+            'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
+            'phone.required' => 'Nomor WhatsApp wajib diisi.',
+            'phone.regex' => 'Nomor WhatsApp harus berupa angka 10 sampai 15 digit.',
+
+            'length' => 'required|integer|min:1',
+            'width' => 'required|integer|min:1|lte:length',
+            'height' => 'nullable|integer|min:1',
+            'quality' => 'nullable|string|max:100',
+            'note' => 'required|string',
+        ], [
+            'length.required' => 'Panjang wajib diisi.',
+            'width.required' => 'Lebar wajib diisi.',
+            'width.lte' => 'Lebar tidak boleh lebih besar dari panjang.',
+            'note.required' => 'Catatan kebutuhan wajib diisi.',
+        ]);
 
         $validated['status'] = 'pending';
 

@@ -6,10 +6,10 @@
 
 <div class="bg-blue-600 text-white py-16 text-center">
     <h1 class="text-4xl font-bold">
-        Panduan DIY
-    </h1>
+    Katalog Produk DIY
+</h1>
     <p class="mt-4 text-lg">
-        Pilih proyek DIY yang ingin Anda buat
+        Pilih proyek DIY yang tersedia sesuai yang ingin Anda buat :D
     </p>
 </div>
 

@@ -30,9 +30,11 @@
                     </div>
 
                     <div>
-                        <label class="block font-semibold mb-1">Nomor WhatsApp</label>
-                        <input type="text" name="phone" value="{{ old('phone') }}" class="w-full border rounded p-2"
-                            placeholder="Contoh: 081234567890">
+                        <label class="block font-semibold mb-1">
+                            Nomor WhatsApp <span class="text-red-600">*</span>
+                        </label>
+                        <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="numeric"
+                            pattern="[0-9]{10,15}" class="w-full border rounded p-2" placeholder="Contoh: 081234567890">
 
                         @error('phone')
                             <p class="text-red-600 text-sm">{{ $message }}</p>
