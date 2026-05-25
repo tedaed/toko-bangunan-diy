@@ -27,32 +27,39 @@ class OrderController extends Controller
 
     public function updateStatus(Request $request, Order $order)
     {
-        if ($order->status === 'closed') {
+        if (in_array($order->status, ['closed', 'cancelled'])) {
             return redirect()
                 ->route('admin.orders.show', $order->id)
-                ->with('error', 'Pesanan sudah closed dan tidak dapat diubah lagi.');
+                ->with('error', 'Pesanan sudah final dan tidak dapat diubah lagi.');
         }
 
         $validated = $request->validate([
             'status' => 'required|in:pending,confirmed,completed,closed,cancelled',
+            'status_note' => 'nullable|string|max:1000',
         ]);
 
-        if ($validated['status'] === 'closed' && $order->status !== 'completed') {
+        $newStatus = $validated['status'];
+
+        if ($newStatus === 'closed' && $order->status !== 'completed') {
             return redirect()
                 ->route('admin.orders.show', $order->id)
                 ->with('error', 'Pesanan hanya dapat diubah menjadi closed setelah status completed.');
         }
 
+        if ($newStatus === 'cancelled' && empty($validated['status_note'])) {
+            return redirect()
+                ->route('admin.orders.show', $order->id)
+                ->with('error', 'Alasan pembatalan wajib diisi.');
+        }
+
         try {
-            DB::transaction(function () use ($order, $validated) {
-                $newStatus = $validated['status'];
+            DB::transaction(function () use ($order, $validated, $newStatus) {
+                $order->load('items.product');
 
                 if (
                     in_array($newStatus, ['confirmed', 'completed']) &&
                     $order->stock_reduced_at === null
                 ) {
-                    $order->load('items.product');
-
                     foreach ($order->items as $item) {
                         if ($item->product && $item->product->stock < $item->quantity) {
                             throw new \Exception(
@@ -70,7 +77,18 @@ class OrderController extends Controller
                     $order->stock_reduced_at = now();
                 }
 
+                if ($newStatus === 'cancelled' && $order->stock_reduced_at !== null) {
+                    foreach ($order->items as $item) {
+                        if ($item->product) {
+                            $item->product->increment('stock', $item->quantity);
+                        }
+                    }
+
+                    $order->stock_reduced_at = null;
+                }
+
                 $order->status = $newStatus;
+                $order->status_note = $validated['status_note'] ?? $order->status_note;
                 $order->save();
             });
         } catch (\Exception $e) {

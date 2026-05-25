@@ -26,10 +26,24 @@ class PosController extends Controller
             'items.*.quantity' => 'nullable|integer|min:1',
         ]);
 
-        $selectedItems = collect($validated['items'])
-            ->filter(function ($item) {
-                return !empty($item['product_id']) && !empty($item['quantity']);
-            });
+        $rows = collect($validated['items']);
+
+        $partialRows = $rows->filter(function ($item) {
+            $hasProduct = !empty($item['product_id']);
+            $hasQuantity = !empty($item['quantity']);
+
+            return ($hasProduct && !$hasQuantity) || (!$hasProduct && $hasQuantity);
+        });
+
+        if ($partialRows->isNotEmpty()) {
+            return back()
+                ->withInput()
+                ->with('error', 'Setiap baris transaksi harus memiliki produk dan quantity.');
+        }
+
+        $selectedItems = $rows->filter(function ($item) {
+            return !empty($item['product_id']) && !empty($item['quantity']);
+        });
 
         if ($selectedItems->isEmpty()) {
             return back()
@@ -37,18 +51,37 @@ class PosController extends Controller
                 ->with('error', 'Minimal pilih satu produk untuk transaksi POS.');
         }
 
+        $groupedItems = $selectedItems
+            ->groupBy('product_id')
+            ->map(function ($items, $productId) {
+                return [
+                    'product_id' => $productId,
+                    'quantity' => $items->sum(function ($item) {
+                        return (int) $item['quantity'];
+                    }),
+                ];
+            })
+            ->values();
+
         try {
-            $order = DB::transaction(function () use ($selectedItems, $validated) {
+            $order = DB::transaction(function () use ($groupedItems, $validated) {
                 $items = collect();
                 $total = 0;
 
-                foreach ($selectedItems as $item) {
-                    $product = Product::findOrFail($item['product_id']);
+                foreach ($groupedItems as $item) {
+                    $product = Product::lockForUpdate()->findOrFail($item['product_id']);
                     $quantity = (int) $item['quantity'];
+
+                    if ($product->stock <= 0) {
+                        throw new \Exception(
+                            'Stok produk ' . $product->name . ' - ' . $product->specification . ' sedang kosong.'
+                        );
+                    }
 
                     if ($product->stock < $quantity) {
                         throw new \Exception(
-                            'Stok produk ' . $product->name . ' - ' . $product->specification . ' tidak mencukupi.'
+                            'Stok produk ' . $product->name . ' - ' . $product->specification .
+                                ' tidak mencukupi. Diminta ' . $quantity . ', tersedia ' . $product->stock . '.'
                         );
                     }
 

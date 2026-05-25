@@ -72,18 +72,7 @@ Route::get('/invoice/{order}', [CheckoutController::class, 'invoice'])
     ->name('checkout.invoice');
 
 
-// =========================
-// CUSTOM REQUEST CUSTOMER
-// =========================
 
-Route::get('/custom-request', [CustomRequestController::class, 'create'])
-    ->name('custom-requests.create');
-
-Route::post('/custom-request', [CustomRequestController::class, 'store'])
-    ->name('custom-requests.store');
-
-Route::get('/custom-request/success/{customRequest}', [CustomRequestController::class, 'success'])
-    ->name('custom-requests.success');
 
 
 // =========================
@@ -96,6 +85,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/my-orders/{order}', [CustomerOrderController::class, 'show'])
         ->name('customer.orders.show');
+
+    Route::get('/custom-request', [CustomRequestController::class, 'create'])
+        ->name('custom-requests.create');
+
+    Route::post('/custom-request', [CustomRequestController::class, 'store'])
+        ->name('custom-requests.store');
+
+    Route::get('/custom-request/success/{customRequest}', [CustomRequestController::class, 'success'])
+        ->name('custom-requests.success');
 });
 
 
@@ -113,8 +111,8 @@ Route::middleware(['auth', 'admin'])
             ->name('dashboard');
 
         Route::resource('/projects', AdminProjectController::class)
-            ->names('projects');    
-            
+            ->names('projects');
+
         Route::resource('/products', ProductController::class)
             ->names('products');
 

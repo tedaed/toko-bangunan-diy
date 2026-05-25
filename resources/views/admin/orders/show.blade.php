@@ -123,16 +123,22 @@
                     <p>{{ $order->note }}</p>
                 </div>
             @endif
+            @if ($order->status_note)
+                <div class="mt-6 bg-yellow-50 border border-yellow-200 p-4 rounded">
+                    <p class="font-bold">Catatan Status:</p>
+                    <p>{{ $order->status_note }}</p>
+                </div>
+            @endif
         </div>
 
         <div class="bg-white rounded-xl shadow p-6 h-fit">
             <h3 class="text-xl font-bold mb-4">Ubah Status Pesanan</h3>
 
-            @if ($order->status === 'closed')
+            @if (in_array($order->status, ['closed', 'cancelled']))
                 <div class="bg-gray-100 text-gray-700 p-4 rounded">
-                    <p class="font-bold">Transaksi sudah closed.</p>
+                    <p class="font-bold">Pesanan sudah final.</p>
                     <p class="text-sm mt-1">
-                        Barang sudah diambil pelanggan dan status pesanan tidak dapat diubah lagi.
+                        Status pesanan sudah {{ strtoupper($order->status) }} dan tidak dapat diubah lagi.
                     </p>
                 </div>
             @else
@@ -166,6 +172,19 @@
                         </select>
                     </div>
 
+                    <div class="mb-4">
+                        <label class="block font-semibold mb-1">
+                            Catatan Status / Alasan Pembatalan
+                        </label>
+
+                        <textarea name="status_note" rows="3" class="w-full border rounded p-2"
+                            placeholder="Contoh: Pesanan dibatalkan karena pelanggan tidak jadi mengambil barang.">{{ old('status_note', $order->status_note) }}</textarea>
+
+                        <p class="text-sm text-gray-500 mt-1">
+                            Wajib diisi jika status diubah menjadi cancelled.
+                        </p>
+                    </div>
+
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded font-semibold">
                         Update Status
                     </button>
@@ -180,3 +199,4 @@
     </div>
 
 @endsection
+    

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
@@ -126,7 +127,7 @@ class CheckoutController extends Controller
 
         $order = DB::transaction(function () use ($validated, $items, $total) {
             $order = Order::create([
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'invoice_number' => 'INV-' . now()->format('YmdHis'),
                 'customer_name' => $validated['customer_name'],
                 'phone' => $validated['phone'],

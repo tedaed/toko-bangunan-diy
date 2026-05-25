@@ -28,10 +28,18 @@ class CustomRequestController extends Controller
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,processed,completed,rejected',
+            'status_note' => 'nullable|string|max:1000',
         ]);
+
+        if ($validated['status'] === 'rejected' && empty($validated['status_note'])) {
+            return redirect()
+                ->route('admin.custom-requests.show', $customRequest->id)
+                ->with('error', 'Alasan penolakan wajib diisi.');
+        }
 
         $customRequest->update([
             'status' => $validated['status'],
+            'status_note' => $validated['status_note'] ?? $customRequest->status_note,
         ]);
 
         return redirect()
