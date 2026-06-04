@@ -7,6 +7,7 @@ use App\Models\DiyRecipe;
 use App\Models\Project;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DiyRecipeController extends Controller
 {
@@ -51,7 +52,7 @@ class DiyRecipeController extends Controller
             'width' => 'nullable|integer|min:0',
             'height' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         DiyRecipe::create($validated);
@@ -77,8 +78,20 @@ class DiyRecipeController extends Controller
             'width' => 'nullable|integer|min:0',
             'height' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
-            'image' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('recipes', 'public');
+        }
+        if ($request->hasFile('image')) {
+            if ($recipe->image && !filter_var($recipe->image, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($recipe->image);
+            }
+
+            $validated['image'] = $request->file('image')->store('recipes', 'public');
+        } else {
+            unset($validated['image']);
+        }
 
         $recipe->update($validated);
 
@@ -89,6 +102,9 @@ class DiyRecipeController extends Controller
 
     public function destroy(DiyRecipe $recipe)
     {
+        if ($recipe->image && !filter_var($recipe->image, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($recipe->image);
+        }
         $recipe->delete();
 
         return redirect()

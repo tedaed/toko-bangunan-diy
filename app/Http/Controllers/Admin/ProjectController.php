@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
@@ -37,17 +38,20 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
             'name.required' => 'Nama project wajib diisi.',
             'description.required' => 'Deskripsi project wajib diisi.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus jpg, jpeg, png, atau webp.',
+            'image.max' => 'Ukuran gambar maksimal 2 MB.',
         ]);
 
-        Project::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'image' => $validated['image'] ?? 'https://via.placeholder.com/300',
-        ]);
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('projects', 'public');
+        }
+
+        Project::create($validated);
 
         return redirect()
             ->route('admin.projects.index')
@@ -64,17 +68,26 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
             'name.required' => 'Nama project wajib diisi.',
             'description.required' => 'Deskripsi project wajib diisi.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus jpg, jpeg, png, atau webp.',
+            'image.max' => 'Ukuran gambar maksimal 2 MB.',
         ]);
 
-        $project->update([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'image' => $validated['image'] ?? 'https://via.placeholder.com/300',
-        ]);
+        if ($request->hasFile('image')) {
+            if ($project->image && !filter_var($project->image, FILTER_VALIDATE_URL)) {
+                Storage::disk('public')->delete($project->image);
+            }
+
+            $validated['image'] = $request->file('image')->store('projects', 'public');
+        } else {
+            unset($validated['image']);
+        }
+
+        $project->update($validated);
 
         return redirect()
             ->route('admin.projects.index')
@@ -87,6 +100,10 @@ class ProjectController extends Controller
             return redirect()
                 ->route('admin.projects.index')
                 ->with('error', 'Project tidak dapat dihapus karena masih memiliki resep DIY.');
+        }
+
+        if ($project->image && !filter_var($project->image, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($project->image);
         }
 
         $project->delete();

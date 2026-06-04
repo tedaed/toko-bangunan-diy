@@ -57,6 +57,15 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::post('/logout', [AuthController::class, 'logout'])
     ->name('logout');
 
+// =========================
+// Register Account
+// =========================
+
+Route::get('/register', [AuthController::class, 'showRegister'])
+    ->name('register');
+
+Route::post('/register', [AuthController::class, 'register'])
+    ->name('register.process');
 
 // =========================
 // CHECKOUT CUSTOMER

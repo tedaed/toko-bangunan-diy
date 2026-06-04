@@ -5,100 +5,88 @@
 
 @section('content')
 
-<div class="bg-white rounded-xl shadow p-6 max-w-3xl">
+    <div class="bg-white rounded-xl shadow p-6 max-w-3xl">
 
-    <h3 class="text-xl font-bold mb-6">Form Tambah Resep DIY</h3>
+        <h3 class="text-xl font-bold mb-6">Form Tambah Resep DIY</h3>
 
-    <form action="{{ route('admin.recipes.store') }}" method="POST">
-        @csrf
+        <form action="{{ route('admin.recipes.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
 
-        <div class="mb-4">
-            <label class="block font-semibold mb-1">Project DIY</label>
-            <select name="project_id" class="w-full border rounded p-2">
-                <option value="">-- Pilih Project --</option>
-                @foreach($projects as $project)
-                    <option value="{{ $project->id }}"
-                            {{ old('project_id') == $project->id ? 'selected' : '' }}>
-                        {{ $project->name }}
-                    </option>
-                @endforeach
-            </select>
+            <div class="mb-4">
+                <label class="block font-semibold mb-1">Project DIY</label>
+                <select name="project_id" class="w-full border rounded p-2">
+                    <option value="">-- Pilih Project --</option>
+                    @foreach ($projects as $project)
+                        <option value="{{ $project->id }}" {{ old('project_id') == $project->id ? 'selected' : '' }}>
+                            {{ $project->name }}
+                        </option>
+                    @endforeach
+                </select>
 
-            @error('project_id')
-                <p class="text-red-600 text-sm">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="mb-4">
-            <label class="block font-semibold mb-1">Nama Resep</label>
-            <input type="text"
-                   name="name"
-                   value="{{ old('name') }}"
-                   class="w-full border rounded p-2"
-                   placeholder="Contoh: Rak Ambalan 60x20 cm">
-
-            @error('name')
-                <p class="text-red-600 text-sm">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div>
-                <label class="block font-semibold mb-1">Panjang (cm)</label>
-                <input type="number"
-                       name="length"
-                       value="{{ old('length') }}"
-                       class="w-full border rounded p-2">
+                @error('project_id')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div>
-                <label class="block font-semibold mb-1">Lebar (cm)</label>
-                <input type="number"
-                       name="width"
-                       value="{{ old('width') }}"
-                       class="w-full border rounded p-2">
+            <div class="mb-4">
+                <label class="block font-semibold mb-1">Nama Resep</label>
+                <input type="text" name="name" value="{{ old('name') }}" class="w-full border rounded p-2"
+                    placeholder="Contoh: Rak Ambalan 60x20 cm">
+
+                @error('name')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div>
-                <label class="block font-semibold mb-1">Tinggi (cm)</label>
-                <input type="number"
-                       name="height"
-                       value="{{ old('height') }}"
-                       class="w-full border rounded p-2"
-                       placeholder="Opsional">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block font-semibold mb-1">Panjang (cm)</label>
+                    <input type="number" name="length" value="{{ old('length') }}" class="w-full border rounded p-2">
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">Lebar (cm)</label>
+                    <input type="number" name="width" value="{{ old('width') }}" class="w-full border rounded p-2">
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">Tinggi (cm)</label>
+                    <input type="number" name="height" value="{{ old('height') }}" class="w-full border rounded p-2"
+                        placeholder="Opsional">
+                </div>
             </div>
-        </div>
 
-        <div class="mb-4">
-            <label class="block font-semibold mb-1">URL Gambar</label>
-            <input type="text"
-                   name="image"
-                   value="{{ old('image') }}"
-                   class="w-full border rounded p-2"
-                   placeholder="https://via.placeholder.com/300">
-        </div>
+            <div class="mb-4">
+                <label class="block font-semibold mb-1">Upload Gambar</label>
 
-        <div class="mb-4">
-            <label class="block font-semibold mb-1">Deskripsi</label>
-            <textarea name="description"
-                      rows="4"
-                      class="w-full border rounded p-2">{{ old('description') }}</textarea>
-        </div>
+                <input type="file" name="image" accept="image/*" class="w-full border rounded p-2 bg-white">
 
-        <div class="flex gap-3">
-            <button type="submit"
-                    class="bg-blue-600 text-white px-5 py-2 rounded font-semibold">
-                Simpan
-            </button>
+                <p class="text-sm text-gray-500 mt-1">
+                    Format JPG, JPEG, PNG, WEBP. Maksimal 2 MB.
+                </p>
 
-            <a href="{{ route('admin.recipes.index') }}"
-               class="bg-gray-600 text-white px-5 py-2 rounded">
-                Batal
-            </a>
-        </div>
+                @error('image')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
 
-    </form>
+            <div class="mb-4">
+                <label class="block font-semibold mb-1">Deskripsi</label>
+                <textarea name="description" rows="4" class="w-full border rounded p-2">{{ old('description') }}</textarea>
+            </div>
 
-</div>
+            <div class="flex gap-3">
+                <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded font-semibold">
+                    Simpan
+                </button>
+
+                <a href="{{ route('admin.recipes.index') }}" class="bg-gray-600 text-white px-5 py-2 rounded">
+                    Batal
+                </a>
+            </div>
+
+        </form>
+
+    </div>
 
 @endsection

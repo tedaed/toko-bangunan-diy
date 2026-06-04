@@ -9,7 +9,7 @@
 
     <h3 class="text-xl font-bold mb-6">Form Tambah Produk</h3>
 
-    <form action="{{ route('admin.products.store') }}" method="POST">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -18,6 +18,7 @@
                 <label class="block font-semibold mb-1">Nama Produk</label>
                 <input type="text" name="name" value="{{ old('name') }}"
                        class="w-full border rounded p-2">
+
                 @error('name')
                     <p class="text-red-600 text-sm">{{ $message }}</p>
                 @enderror
@@ -27,6 +28,7 @@
                 <label class="block font-semibold mb-1">Kategori</label>
                 <input type="text" name="category" value="{{ old('category') }}"
                        class="w-full border rounded p-2">
+
                 @error('category')
                     <p class="text-red-600 text-sm">{{ $message }}</p>
                 @enderror
@@ -37,6 +39,10 @@
                 <input type="text" name="specification" value="{{ old('specification') }}"
                        class="w-full border rounded p-2"
                        placeholder="Contoh: 60x20 cm, S-6, 3 cm">
+
+                @error('specification')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>
@@ -44,6 +50,7 @@
                 <input type="text" name="unit" value="{{ old('unit') }}"
                        class="w-full border rounded p-2"
                        placeholder="pcs, lembar, meter">
+
                 @error('unit')
                     <p class="text-red-600 text-sm">{{ $message }}</p>
                 @enderror
@@ -53,6 +60,7 @@
                 <label class="block font-semibold mb-1">Harga</label>
                 <input type="number" name="price" value="{{ old('price') }}"
                        class="w-full border rounded p-2">
+
                 @error('price')
                     <p class="text-red-600 text-sm">{{ $message }}</p>
                 @enderror
@@ -62,6 +70,7 @@
                 <label class="block font-semibold mb-1">Stok</label>
                 <input type="number" name="stock" value="{{ old('stock') }}"
                        class="w-full border rounded p-2">
+
                 @error('stock')
                     <p class="text-red-600 text-sm">{{ $message }}</p>
                 @enderror
@@ -70,10 +79,20 @@
         </div>
 
         <div class="mt-4">
-            <label class="block font-semibold mb-1">URL Gambar</label>
-            <input type="text" name="image" value="{{ old('image') }}"
-                   class="w-full border rounded p-2"
-                   placeholder="https://via.placeholder.com/300">
+            <label class="block font-semibold mb-1">Gambar Produk</label>
+
+            <input type="file"
+                   name="image"
+                   accept="image/*"
+                   class="w-full border rounded p-2">
+
+            <p class="text-sm text-gray-500 mt-1">
+                Format: JPG, JPEG, PNG, WEBP. Maksimal 2MB.
+            </p>
+
+            @error('image')
+                <p class="text-red-600 text-sm">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="mt-4">
@@ -81,6 +100,10 @@
             <textarea name="description"
                       class="w-full border rounded p-2"
                       rows="4">{{ old('description') }}</textarea>
+
+            @error('description')
+                <p class="text-red-600 text-sm">{{ $message }}</p>
+            @enderror
         </div>
 
         <div class="mt-6 flex gap-3">

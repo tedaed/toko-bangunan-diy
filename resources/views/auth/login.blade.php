@@ -52,6 +52,12 @@
                     Login
                 </button>
             </form>
+            <p class="text-center text-sm text-gray-600 mt-6">
+                Belum punya akun?
+                <a href="{{ route('register') }}" class="text-blue-600 font-semibold">
+                    Register di sini
+                </a>
+            </p>
 
             <div class="mt-6 bg-gray-100 rounded p-4 text-sm text-gray-700">
                 <p class="font-bold mb-1">Akun Demo:</p>
