@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\DiyRecipe;
-use App\Models\DiyComponentOption;
+// use App\Models\DiyComponentOption;
+use App\Services\RuleBasedRecommendationService;
 
 class DiyController extends Controller
 {
@@ -36,16 +37,60 @@ class DiyController extends Controller
         return view('diy.recipe', compact('recipe'));
     }
 
-    public function calculate(Request $request, DiyRecipe $recipe)
+    public function calculate(Request $request, DiyRecipe $recipe, RuleBasedRecommendationService $ruleService)
     {
         $recipe->load('project', 'components.options.product');
 
         $selectedComponents = $request->input('components', []);
+
         $validOptions = $recipe->components
             ->flatMap(function ($component) {
                 return $component->options;
             })
             ->keyBy('id');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Backend Rule-Based Recheck D:
+    |--------------------------------------------------------------------------
+    | Bagian ini mencari bahan utama dari pilihan user, misalnya Papan Kayu.
+    | Setelah itu backend menjalankan ulang RuleBasedRecommendationService.
+    | Jadi rule-based tidak hanya berjalan di JavaScript/API, tetapi juga
+    | dicek ulang saat user menekan tombol Hitung Estimasi.
+    */
+        $mainProduct = null;
+
+        foreach ($selectedComponents as $componentId => $data) {
+            if (!isset($data['selected'])) {
+                continue;
+            }
+
+            $optionId = (int) ($data['option_id'] ?? 0);
+
+            if (!$validOptions->has($optionId)) {
+                continue;
+            }
+
+            $option = $validOptions->get($optionId);
+
+            $componentName = strtolower($option->component->component_name ?? '');
+
+            if (str_contains($componentName, 'papan') || str_contains($componentName, 'kayu')) {
+                $mainProduct = $option->product;
+                break;
+            }
+        }
+
+        $ruleBasedResult = null;
+        $recommendedByComponent = collect();
+
+        if ($mainProduct) {
+            $ruleBasedResult = $ruleService->recommend($recipe, $mainProduct);
+
+            $recommendedByComponent = collect($ruleBasedResult['recommendations'] ?? [])
+                ->filter()
+                ->keyBy('component_id');
+        }
 
         $items = [];
         $checkoutItems = [];
@@ -66,6 +111,30 @@ class DiyController extends Controller
             $option = $validOptions->get($optionId);
             $product = $option->product;
 
+            /*
+        |--------------------------------------------------------------------------
+        | Minimum Quantity Rule:D
+        |--------------------------------------------------------------------------
+        | Jika komponen ini punya rekomendasi quantity dari rule-based,
+        | maka backend memastikan quantity tidak boleh kurang dari minimum rule.
+        | User tetap boleh membeli lebih banyak.
+        */
+            $ruleRecommendation = $recommendedByComponent->get($option->component->id);
+
+            $minimumRuleQuantity = null;
+            $isRuleRecommendedProduct = false;
+
+            if ($ruleRecommendation) {
+                $minimumRuleQuantity = (int) $ruleRecommendation['quantity'];
+
+                if ($quantity < $minimumRuleQuantity) {
+                    $quantity = $minimumRuleQuantity;
+                }
+
+                $isRuleRecommendedProduct =
+                    (int) $ruleRecommendation['recommended_product_id'] === (int) $product->id;
+            }
+
             $subtotal = $product->price * $quantity;
             $total += $subtotal;
 
@@ -75,18 +144,23 @@ class DiyController extends Controller
                 'quantity' => $quantity,
                 'subtotal' => $subtotal,
                 'stock_enough' => $product->stock >= $quantity,
+                'minimum_rule_quantity' => $minimumRuleQuantity,
+                'is_rule_recommended_product' => $isRuleRecommendedProduct,
             ];
+
             $checkoutItems[] = [
                 'product_id' => $product->id,
                 'quantity' => $quantity,
             ];
         }
+
         session([
             'checkout' => [
                 'recipe_id' => $recipe->id,
                 'items' => $checkoutItems,
             ]
         ]);
-        return view('diy.result', compact('recipe', 'items', 'total'));
+
+        return view('diy.result', compact('recipe', 'items', 'total', 'ruleBasedResult'));
     }
 }

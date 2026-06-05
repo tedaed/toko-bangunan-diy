@@ -18,6 +18,12 @@
 
             <h2 class="text-2xl font-bold mb-6">Pilih Komponen</h2>
 
+            <div id="ruleBasedInfo"
+                 class="hidden mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded">
+                <p class="font-bold mb-2">Rekomendasi Rule-Based</p>
+                <div id="ruleBasedRules" class="text-sm space-y-1"></div>
+            </div>
+
             <form action="{{ route('diy.calculate', $recipe->id) }}" method="POST">
                 @csrf
 
@@ -46,8 +52,10 @@
                                 </div>
 
                                 <label class="flex items-center gap-2">
-                                    <input type="checkbox" name="components[{{ $component->id }}][selected]"
-                                        value="1" {{ $component->is_required ? 'checked' : '' }}>
+                                    <input type="checkbox"
+                                           name="components[{{ $component->id }}][selected]"
+                                           value="1"
+                                           {{ $component->is_required ? 'checked' : '' }}>
                                     Pilih
                                 </label>
                             </div>
@@ -57,16 +65,26 @@
                             </label>
 
                             <select name="components[{{ $component->id }}][option_id]"
-                                class="w-full border rounded p-2 mb-3">
+                                    data-component-id="{{ $component->id }}"
+                                    data-component-name="{{ strtolower($component->component_name) }}"
+                                    class="component-select w-full border rounded p-2 mb-3">
                                 @foreach ($component->options as $option)
-                                    <option value="{{ $option->id }}" {{ $option->is_default ? 'selected' : '' }}>
-                                        {{ $option->product->name }}
-                                        -
-                                        {{ $option->product->specification }}
-                                        |
-                                        Rp {{ number_format($option->product->price, 0, ',', '.') }}
-                                        |
-                                        Stok: {{ $option->product->stock }}
+                                    @php
+                                        $optionText =
+                                            $option->product->name .
+                                            ' - ' .
+                                            $option->product->specification .
+                                            ' | Rp ' .
+                                            number_format($option->product->price, 0, ',', '.') .
+                                            ' | Stok: ' .
+                                            $option->product->stock;
+                                    @endphp
+
+                                    <option value="{{ $option->id }}"
+                                            data-product-id="{{ $option->product->id }}"
+                                            data-original-text="{{ $optionText }}"
+                                            {{ $option->is_default ? 'selected' : '' }}>
+                                        {{ $optionText }}
                                     </option>
                                 @endforeach
                             </select>
@@ -75,9 +93,12 @@
                                 Quantity
                             </label>
 
-                            <input type="number" name="components[{{ $component->id }}][quantity]"
-                                value="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}" min="1"
-                                class="w-full border rounded p-2">
+                            <input type="number"
+                                   name="components[{{ $component->id }}][quantity]"
+                                   data-component-id="{{ $component->id }}"
+                                   value="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}"
+                                   min="1"
+                                   class="component-qty w-full border rounded p-2">
                         </div>
 
                     @empty
@@ -94,6 +115,135 @@
 
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const apiUrl = "{{ route('api.rule-recommendations') }}";
+            const recipeId = "{{ $recipe->id }}";
+
+            const selects = document.querySelectorAll('.component-select');
+            const ruleBox = document.getElementById('ruleBasedInfo');
+            const ruleList = document.getElementById('ruleBasedRules');
+
+            function findMainProductSelect() {
+                return Array.from(selects).find(function (select) {
+                    const name = select.dataset.componentName || '';
+
+                    return name.includes('papan') || name.includes('kayu');
+                });
+            }
+
+            function resetOptionLabels() {
+                selects.forEach(function (select) {
+                    Array.from(select.options).forEach(function (option) {
+                        if (option.dataset.originalText) {
+                            option.textContent = option.dataset.originalText;
+                        }
+                    });
+                });
+            }
+
+            function updateRuleInfo(rules) {
+                if (!rules || rules.length === 0) {
+                    ruleBox.classList.add('hidden');
+                    ruleList.innerHTML = '';
+                    return;
+                }
+
+                ruleBox.classList.remove('hidden');
+
+                ruleList.innerHTML = rules.map(function (rule) {
+                    return `
+                        <div>
+                            <span class="font-semibold">${rule.code}</span>:
+                            ${rule.if}
+                            →
+                            ${rule.then}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            async function applyRuleBasedRecommendation() {
+                const mainSelect = findMainProductSelect();
+
+                if (!mainSelect) {
+                    console.log('Komponen utama papan/kayu tidak ditemukan.');
+                    return;
+                }
+
+                const selectedOption = mainSelect.options[mainSelect.selectedIndex];
+                const mainProductId = selectedOption.dataset.productId;
+
+                if (!mainProductId) {
+                    return;
+                }
+
+                resetOptionLabels();
+
+                try {
+                    const response = await fetch(
+                        `${apiUrl}?recipe_id=${recipeId}&main_product_id=${mainProductId}`,
+                        {
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        }
+                    );
+
+                    const data = await response.json();
+
+                    if (!data.success) {
+                        return;
+                    }
+
+                    const recommendations = data.recommendations || {};
+
+                    Object.values(recommendations).forEach(function (recommendation) {
+                        if (!recommendation) {
+                            return;
+                        }
+
+                        const select = document.querySelector(
+                            `.component-select[data-component-id="${recommendation.component_id}"]`
+                        );
+
+                        const quantityInput = document.querySelector(
+                            `.component-qty[data-component-id="${recommendation.component_id}"]`
+                        );
+
+                        if (select && recommendation.option_id) {
+                            select.value = recommendation.option_id;
+
+                            const recommendedOption = select.querySelector(
+                                `option[value="${recommendation.option_id}"]`
+                            );
+
+                            if (recommendedOption && recommendedOption.dataset.originalText) {
+                                recommendedOption.textContent = '⭐ ' + recommendedOption.dataset.originalText;
+                            }
+                        }
+
+                        if (quantityInput && recommendation.quantity) {
+                            quantityInput.value = recommendation.quantity;
+                        }
+                    });
+
+                    updateRuleInfo(data.rules || []);
+
+                } catch (error) {
+                    console.error('Gagal mengambil rekomendasi rule-based:', error);
+                }
+            }
+
+            const mainSelect = findMainProductSelect();
+
+            if (mainSelect) {
+                mainSelect.addEventListener('change', applyRuleBasedRecommendation);
+                applyRuleBasedRecommendation();
+            }
+        });
+    </script>
 
 </body>
 

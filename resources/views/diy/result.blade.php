@@ -14,9 +14,40 @@
 
             <h2 class="text-2xl font-bold mb-6">Rincian Belanja</h2>
 
+            @if (!empty($ruleBasedResult) && !empty($ruleBasedResult['rules']))
+                <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded">
+                    <p class="font-bold mb-2">Rekomendasi Material</p>
+
+                    <p class="text-sm mb-3">
+                        Rekomendasi dihitung berdasarkan bahan utama:
+                        <span class="font-semibold">
+                            {{ $ruleBasedResult['main_product']['name'] ?? '-' }}
+                            -
+                            {{ $ruleBasedResult['main_product']['specification'] ?? '-' }}
+                        </span>
+                    </p>
+
+                    <div class="mt-3">
+                        <p class="font-semibold mb-1">Detail Aturan Sistem:</p>
+
+                        <div class="text-sm space-y-1">
+                            @foreach ($ruleBasedResult['rules'] as $rule)
+                                <div>
+                                    <span class="font-semibold">{{ $rule['code'] }}</span>:
+                                    {{ $rule['if'] }}
+                                    →
+                                    {{ $rule['then'] }}
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if (count($items) == 0)
 
                 <p class="text-gray-600">Belum ada komponen yang dipilih.</p>
+
             @else
                 <div class="space-y-4">
                     @foreach ($items as $item)
@@ -46,6 +77,20 @@
                                 Subtotal:
                                 Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
                             </p>
+
+                            @if (!empty($item['is_rule_recommended_product']))
+                                <p class="text-blue-600 font-semibold mt-2">
+                                    ⭐ Direkomendasikan oleh sistem untuk proyek ini.
+                                </p>
+                            @endif
+
+                            @if (!empty($item['minimum_rule_quantity']))
+                                <p class="text-sm text-gray-600 mt-1">
+                                    Jumlah minimum yang disarankan:
+                                    {{ $item['minimum_rule_quantity'] }}
+                                    {{ $item['product']->unit }}
+                                </p>
+                            @endif
 
                             @if ($item['stock_enough'])
                                 <p class="text-green-600 font-bold mt-2">

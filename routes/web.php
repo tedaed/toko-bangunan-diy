@@ -19,6 +19,8 @@ use App\Http\Controllers\Admin\PosController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ProjectController as AdminProjectController;
 
+use App\Http\Controllers\Api\RuleRecommendationController;
+
 // =========================
 // PUBLIC / CUSTOMER AREA
 // =========================
@@ -172,3 +174,11 @@ Route::middleware(['auth', 'admin'])
         Route::get('/reports/sales', [ReportController::class, 'sales'])
             ->name('reports.sales');
     });
+
+
+// =================
+// API AREA!!! (Rule-Based) :D
+// =================
+
+Route::get('/api/rule-recommendations', [RuleRecommendationController::class, 'show'])
+    ->name('api.rule-recommendations');
