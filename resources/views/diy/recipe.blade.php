@@ -18,8 +18,7 @@
 
             <h2 class="text-2xl font-bold mb-6">Pilih Komponen</h2>
 
-            <div id="ruleBasedInfo"
-                 class="hidden mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded">
+            <div id="ruleBasedInfo" class="hidden mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded">
                 <p class="font-bold mb-2">Rekomendasi Rule-Based</p>
                 <div id="ruleBasedRules" class="text-sm space-y-1"></div>
             </div>
@@ -52,10 +51,8 @@
                                 </div>
 
                                 <label class="flex items-center gap-2">
-                                    <input type="checkbox"
-                                           name="components[{{ $component->id }}][selected]"
-                                           value="1"
-                                           {{ $component->is_required ? 'checked' : '' }}>
+                                    <input type="checkbox" name="components[{{ $component->id }}][selected]"
+                                        value="1" {{ $component->is_required ? 'checked' : '' }}>
                                     Pilih
                                 </label>
                             </div>
@@ -65,9 +62,9 @@
                             </label>
 
                             <select name="components[{{ $component->id }}][option_id]"
-                                    data-component-id="{{ $component->id }}"
-                                    data-component-name="{{ strtolower($component->component_name) }}"
-                                    class="component-select w-full border rounded p-2 mb-3">
+                                data-component-id="{{ $component->id }}"
+                                data-component-name="{{ strtolower($component->component_name) }}"
+                                class="component-select w-full border rounded p-2 mb-3">
                                 @foreach ($component->options as $option)
                                     @php
                                         $optionText =
@@ -80,10 +77,9 @@
                                             $option->product->stock;
                                     @endphp
 
-                                    <option value="{{ $option->id }}"
-                                            data-product-id="{{ $option->product->id }}"
-                                            data-original-text="{{ $optionText }}"
-                                            {{ $option->is_default ? 'selected' : '' }}>
+                                    <option value="{{ $option->id }}" data-product-id="{{ $option->product->id }}"
+                                        data-original-text="{{ $optionText }}"
+                                        {{ $option->is_default ? 'selected' : '' }}>
                                         {{ $optionText }}
                                     </option>
                                 @endforeach
@@ -93,12 +89,10 @@
                                 Quantity
                             </label>
 
-                            <input type="number"
-                                   name="components[{{ $component->id }}][quantity]"
-                                   data-component-id="{{ $component->id }}"
-                                   value="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}"
-                                   min="1"
-                                   class="component-qty w-full border rounded p-2">
+                            <input type="number" name="components[{{ $component->id }}][quantity]"
+                                data-component-id="{{ $component->id }}"
+                                value="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}" min="1"
+                                class="component-qty w-full border rounded p-2">
                         </div>
 
                     @empty
@@ -117,7 +111,28 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.component-qty').forEach(function(input) {
+                input.addEventListener('input', function() {
+                    const ruleMin = parseInt(input.dataset.ruleMin || 0);
+                    const currentValue = parseInt(input.value || 1);
+
+                    let warning = input.parentElement.querySelector('.quantity-warning');
+
+                    if (!warning) {
+                        warning = document.createElement('p');
+                        warning.className = 'quantity-warning text-yellow-600 text-sm mt-1';
+                        input.parentElement.appendChild(warning);
+                    }
+
+                    if (ruleMin > 0 && currentValue < ruleMin) {
+                        warning.textContent =
+                            'Peringatan: jumlah ini di bawah rekomendasi sistem untuk proyek lengkap.';
+                    } else {
+                        warning.textContent = '';
+                    }
+                });
+            });
             const apiUrl = "{{ route('api.rule-recommendations') }}";
             const recipeId = "{{ $recipe->id }}";
 
@@ -126,16 +141,22 @@
             const ruleList = document.getElementById('ruleBasedRules');
 
             function findMainProductSelect() {
-                return Array.from(selects).find(function (select) {
+                return Array.from(selects).find(function(select) {
                     const name = select.dataset.componentName || '';
 
-                    return name.includes('papan') || name.includes('kayu');
+                    return name.includes('papan') ||
+                        name.includes('kayu') ||
+                        name.includes('kaca') ||
+                        name.includes('kawat') ||
+                        name.includes('hollow') ||
+                        name.includes('triplek') ||
+                        name.includes('blok');
                 });
             }
 
             function resetOptionLabels() {
-                selects.forEach(function (select) {
-                    Array.from(select.options).forEach(function (option) {
+                selects.forEach(function(select) {
+                    Array.from(select.options).forEach(function(option) {
                         if (option.dataset.originalText) {
                             option.textContent = option.dataset.originalText;
                         }
@@ -152,7 +173,7 @@
 
                 ruleBox.classList.remove('hidden');
 
-                ruleList.innerHTML = rules.map(function (rule) {
+                ruleList.innerHTML = rules.map(function(rule) {
                     return `
                         <div>
                             <span class="font-semibold">${rule.code}</span>:
@@ -183,8 +204,7 @@
 
                 try {
                     const response = await fetch(
-                        `${apiUrl}?recipe_id=${recipeId}&main_product_id=${mainProductId}`,
-                        {
+                        `${apiUrl}?recipe_id=${recipeId}&main_product_id=${mainProductId}`, {
                             headers: {
                                 'Accept': 'application/json'
                             }
@@ -199,7 +219,7 @@
 
                     const recommendations = data.recommendations || {};
 
-                    Object.values(recommendations).forEach(function (recommendation) {
+                    Object.values(recommendations).forEach(function(recommendation) {
                         if (!recommendation) {
                             return;
                         }
@@ -220,12 +240,14 @@
                             );
 
                             if (recommendedOption && recommendedOption.dataset.originalText) {
-                                recommendedOption.textContent = '⭐ ' + recommendedOption.dataset.originalText;
+                                recommendedOption.textContent = '⭐ ' + recommendedOption.dataset
+                                    .originalText;
                             }
                         }
 
                         if (quantityInput && recommendation.quantity) {
                             quantityInput.value = recommendation.quantity;
+                            quantityInput.dataset.ruleMin = recommendation.quantity;
                         }
                     });
 

@@ -47,7 +47,6 @@
             @if (count($items) == 0)
 
                 <p class="text-gray-600">Belum ada komponen yang dipilih.</p>
-
             @else
                 <div class="space-y-4">
                     @foreach ($items as $item)
@@ -90,6 +89,27 @@
                                     {{ $item['minimum_rule_quantity'] }}
                                     {{ $item['product']->unit }}
                                 </p>
+                            @endif
+                            @if (!empty($item['minimum_rule_quantity']))
+                                <p class="text-sm text-gray-600 mt-1">
+                                    Jumlah yang direkomendasikan sistem:
+                                    {{ $item['minimum_rule_quantity'] }}
+                                    {{ $item['product']->unit }}
+                                </p>
+                            @endif
+
+                            @if (!empty($item['is_below_recommended_quantity']))
+                                <div class="mt-2 bg-yellow-100 border border-yellow-300 text-yellow-800 p-3 rounded">
+                                    <p class="font-semibold">Peringatan:</p>
+                                    <p class="text-sm">
+                                        Jumlah yang dipilih berada di bawah rekomendasi sistem.
+                                        Untuk proyek lengkap, kami merekomendasikan minimal
+                                        {{ $item['minimum_rule_quantity'] }}
+                                        {{ $item['product']->unit }}.
+                                        Anda tetap dapat melanjutkan checkout apabila pembelian ini hanya untuk kebutuhan
+                                        sebagian atau reparasi. Harap di cek kembali :D
+                                    </p>
+                                </div>
                             @endif
 
                             @if ($item['stock_enough'])

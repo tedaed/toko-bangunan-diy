@@ -75,7 +75,15 @@ class DiyController extends Controller
 
             $componentName = strtolower($option->component->component_name ?? '');
 
-            if (str_contains($componentName, 'papan') || str_contains($componentName, 'kayu')) {
+            if (
+                str_contains($componentName, 'papan') ||
+                str_contains($componentName, 'kayu') ||
+                str_contains($componentName, 'kaca') ||
+                str_contains($componentName, 'kawat') ||
+                str_contains($componentName, 'hollow') ||
+                str_contains($componentName, 'triplek') ||
+                str_contains($componentName, 'blok')
+            ) {
                 $mainProduct = $option->product;
                 break;
             }
@@ -117,18 +125,39 @@ class DiyController extends Controller
         |--------------------------------------------------------------------------
         | Jika komponen ini punya rekomendasi quantity dari rule-based,
         | maka backend memastikan quantity tidak boleh kurang dari minimum rule.
-        | User tetap boleh membeli lebih banyak.
+        | User tetap boleh membeli lebih banyak/kurang.
         */
             $ruleRecommendation = $recommendedByComponent->get($option->component->id);
 
             $minimumRuleQuantity = null;
             $isRuleRecommendedProduct = false;
+            $isBelowRecommendedQuantity = false;
 
             if ($ruleRecommendation) {
                 $minimumRuleQuantity = (int) $ruleRecommendation['quantity'];
 
-                if ($quantity < $minimumRuleQuantity) {
-                    $quantity = $minimumRuleQuantity;
+                $isBelowRecommendedQuantity = $quantity < $minimumRuleQuantity;
+
+                $isRuleRecommendedProduct =
+                    (int) $ruleRecommendation['recommended_product_id'] === (int) $product->id;
+            }
+
+            if ($ruleRecommendation) {
+                $minimumRuleQuantity = (int) $ruleRecommendation['quantity'];
+
+                $ruleRecommendation = $recommendedByComponent->get($option->component->id);
+
+                $minimumRuleQuantity = null;
+                $isRuleRecommendedProduct = false;
+                $isBelowRecommendedQuantity = false;
+
+                if ($ruleRecommendation) {
+                    $minimumRuleQuantity = (int) $ruleRecommendation['quantity'];
+
+                    $isBelowRecommendedQuantity = $quantity < $minimumRuleQuantity;
+
+                    $isRuleRecommendedProduct =
+                        (int) $ruleRecommendation['recommended_product_id'] === (int) $product->id;
                 }
 
                 $isRuleRecommendedProduct =
@@ -146,6 +175,7 @@ class DiyController extends Controller
                 'stock_enough' => $product->stock >= $quantity,
                 'minimum_rule_quantity' => $minimumRuleQuantity,
                 'is_rule_recommended_product' => $isRuleRecommendedProduct,
+                'is_below_recommended_quantity' => $isBelowRecommendedQuantity,
             ];
 
             $checkoutItems[] = [
