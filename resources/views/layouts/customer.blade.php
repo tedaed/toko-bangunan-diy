@@ -89,7 +89,7 @@
                 Toko Bangunan XYZ
             </p>
             <p class="text-gray-400 text-sm mt-2">
-                Sistem rekomendasi bundling proyek DIY berbasis knowledge-based.
+                Mulai Proyek DIY Kamu dengan lebih Mudah.
             </p>
         </div>
     </footer>

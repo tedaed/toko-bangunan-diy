@@ -46,7 +46,7 @@
                             Metode Pembayaran <span class="text-red-600">*</span>
                         </label>
                         <select name="payment_method" class="w-full border rounded p-2">
-                            <option value="QRIS">QRIS</option>
+                            {{-- <option value="QRIS">QRIS</option> --}}
                             <option value="Bayar di Toko">Bayar di Toko</option>
                         </select>
                     </div>

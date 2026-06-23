@@ -8,7 +8,17 @@
     <div class="bg-white rounded-xl shadow p-6 max-w-3xl">
 
         <h3 class="text-xl font-bold mb-6">Form Edit Produk</h3>
+        @if ($errors->any())
+            <div class="mb-4 bg-red-100 border border-red-300 text-red-700 p-4 rounded">
+                <p class="font-bold mb-2">Produk belum berhasil diperbarui:</p>
 
+                <ul class="list-disc pl-5 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <form action="{{ route('admin.products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
@@ -167,9 +177,31 @@
                     @enderror
                 </div>
 
-            </div>
 
+                <div class="mt-4">
+                    <label class="block font-semibold mb-1">Deskripsi</label>
+
+                    <textarea name="description" rows="4" class="w-full border rounded p-2">{{ old('description', $product->description) }}</textarea>
+
+                    @error('description')
+                        <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+
+            </div>
+            <div class="mt-4 flex gap-3">
+            <button type="submit" class="bg-blue-600 text-white px-5 py-2 rounded font-semibold hover:bg-blue-700">
+                Update Produk
+            </button>
+
+            <a href="{{ route('admin.products.index') }}"
+                class="bg-gray-600 text-white px-5 py-2 rounded hover:bg-gray-700">
+                Batal
+            </a>
+        </div>
         </form>
+        
 
     </div>
 

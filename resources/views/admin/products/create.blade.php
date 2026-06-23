@@ -142,8 +142,21 @@
                 </div>
 
             </div>
+            
+            <div class="flex justify-end gap-3 mt-6 pt-5 border-t">
+                <a href="{{ route('admin.products.index') }}"
+                    class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition">
+                    Batal
+                </a>
+
+                <button type="submit"
+                    class="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
+                    Simpan Produk
+                </button>
+            </div>
 
         </form>
+
 
     </div>
 

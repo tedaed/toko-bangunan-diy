@@ -43,6 +43,19 @@ class DiyController extends Controller
 
         $selectedComponents = $request->input('components', []);
 
+        $missingRequiredComponents = $recipe->components
+            ->filter(function ($component) use ($selectedComponents) {
+                return $component->is_required && !isset($selectedComponents[$component->id]['selected']);
+            })
+            ->pluck('component_name')
+            ->values();
+
+        if ($missingRequiredComponents->isNotEmpty()) {
+            return redirect()
+                ->route('diy.recipe', $recipe->id)
+                ->withInput()
+                ->with('required_warning', 'Material wajib belum lengkap: ' . $missingRequiredComponents->implode(', ') . '. Apakah anda yaking melanjutkan pesanan? Anda bisa memilih kembali material yang diperlukan.');
+        }
         $validOptions = $recipe->components
             ->flatMap(function ($component) {
                 return $component->options;

@@ -17,6 +17,12 @@
         <div class="bg-white rounded shadow p-6 max-w-4xl mx-auto">
 
             <h2 class="text-2xl font-bold mb-6">Pilih Komponen</h2>
+            @if (session('required_warning'))
+                <div class="mb-6 bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded">
+                    <p class="font-bold">Peringatan:</p>
+                    <p>{{ session('required_warning') }}</p>
+                </div>
+            @endif
 
             <div id="ruleBasedInfo" class="hidden mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded">
                 <p class="font-bold mb-2">Rekomendasi Rule-Based</p>
@@ -51,8 +57,16 @@
                                 </div>
 
                                 <label class="flex items-center gap-2">
+                                    @php
+                                        $oldComponents = old('components');
+                                        $isChecked =
+                                            $oldComponents !== null
+                                                ? isset($oldComponents[$component->id]['selected'])
+                                                : $component->is_required;
+                                    @endphp
+
                                     <input type="checkbox" name="components[{{ $component->id }}][selected]"
-                                        value="1" {{ $component->is_required ? 'checked' : '' }}>
+                                        value="1" {{ $isChecked ? 'checked' : '' }}>
                                     Pilih
                                 </label>
                             </div>
@@ -93,6 +107,10 @@
                                 data-component-id="{{ $component->id }}"
                                 value="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}" min="1"
                                 class="component-qty w-full border rounded p-2">
+                            <p id="rule-quantity-{{ $component->id }}"
+                                class="hidden mt-1 text-xs font-medium text-blue-600">
+                            </p>
+                        
                         </div>
 
                     @empty
@@ -248,6 +266,17 @@
                         if (quantityInput && recommendation.quantity) {
                             quantityInput.value = recommendation.quantity;
                             quantityInput.dataset.ruleMin = recommendation.quantity;
+
+                            const recommendationText = document.getElementById(
+                                `rule-quantity-${recommendation.component_id}`
+                            );
+
+                            if (recommendationText) {
+                                recommendationText.textContent =
+                                    `★ Jumlah rekomendasi sistem untuk proyek lengkap: ${recommendation.quantity}`;
+
+                                recommendationText.classList.remove('hidden');
+                            }
                         }
                     });
 

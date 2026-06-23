@@ -83,13 +83,7 @@
                                 </p>
                             @endif
 
-                            @if (!empty($item['minimum_rule_quantity']))
-                                <p class="text-sm text-gray-600 mt-1">
-                                    Jumlah minimum yang disarankan:
-                                    {{ $item['minimum_rule_quantity'] }}
-                                    {{ $item['product']->unit }}
-                                </p>
-                            @endif
+                            
                             @if (!empty($item['minimum_rule_quantity']))
                                 <p class="text-sm text-gray-600 mt-1">
                                     Jumlah yang direkomendasikan sistem:

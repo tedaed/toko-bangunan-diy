@@ -59,11 +59,11 @@
                 </a>
             </p>
 
-            <div class="mt-6 bg-gray-100 rounded p-4 text-sm text-gray-700">
+            {{-- <div class="mt-6 bg-gray-100 rounded p-4 text-sm text-gray-700">
                 <p class="font-bold mb-1">Akun Demo:</p>
                 <p>Admin: admin@tokobangunan.test / password123</p>
                 <p>Customer: customer@tokobangunan.test / password123</p>
-            </div>
+            </div> --}}
 
         </div>
 
