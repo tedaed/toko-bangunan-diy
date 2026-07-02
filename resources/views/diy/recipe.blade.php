@@ -16,6 +16,20 @@
     <div class="p-10">
         <div class="bg-white rounded shadow p-6 max-w-4xl mx-auto">
 
+            <div class="mb-6 bg-gray-50 border rounded-lg p-4">
+
+                <label class="block font-bold mb-2">
+                    Jumlah Bundling / Set Proyek
+                </label>
+
+                <input type="number" id="bundleQty" min="1" value="1" class="w-32 border rounded p-2">
+
+                <p class="text-sm text-gray-500 mt-2">
+                    Semua jumlah rekomendasi komponen akan dikalikan sesuai jumlah bundling.
+                </p>
+
+            </div>
+
             <h2 class="text-2xl font-bold mb-6">Pilih Komponen</h2>
             @if (session('required_warning'))
                 <div class="mb-6 bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded">
@@ -31,7 +45,7 @@
 
             <form action="{{ route('diy.calculate', $recipe->id) }}" method="POST">
                 @csrf
-
+                <input type="hidden" name="bundle_quantity" id="bundleQuantityHidden" value="1">
                 <div class="space-y-6">
                     @forelse ($recipe->components as $component)
 
@@ -105,12 +119,13 @@
 
                             <input type="number" name="components[{{ $component->id }}][quantity]"
                                 data-component-id="{{ $component->id }}"
+                                data-original-qty="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}"
                                 value="{{ $defaultOption ? $defaultOption->recommended_quantity : 1 }}" min="1"
                                 class="component-qty w-full border rounded p-2">
                             <p id="rule-quantity-{{ $component->id }}"
                                 class="hidden mt-1 text-xs font-medium text-blue-600">
                             </p>
-                        
+
                         </div>
 
                     @empty
@@ -264,6 +279,7 @@
                         }
 
                         if (quantityInput && recommendation.quantity) {
+                            quantityInput.dataset.originalQty = recommendation.quantity;
                             quantityInput.value = recommendation.quantity;
                             quantityInput.dataset.ruleMin = recommendation.quantity;
 
@@ -280,6 +296,8 @@
                         }
                     });
 
+                    updateBundleQuantity();
+
                     updateRuleInfo(data.rules || []);
 
                 } catch (error) {
@@ -287,6 +305,47 @@
                 }
             }
 
+
+            const bundleInput = document.getElementById('bundleQty');
+
+            function updateBundleQuantity() {
+
+                const multiplier = parseInt(bundleInput.value) || 1;
+                document.getElementById('bundleQuantityHidden').value = multiplier;
+                document.querySelectorAll('.component-qty').forEach(function(qtyInput) {
+
+                    const originalQty =
+                        parseInt(qtyInput.dataset.originalQty || qtyInput.value);
+
+                    qtyInput.value = originalQty * multiplier;
+
+                    qtyInput.dataset.ruleMin = originalQty * multiplier;
+
+                    const componentId =
+                        qtyInput.dataset.componentId;
+
+                    const recommendationText =
+                        document.getElementById(
+                            `rule-quantity-${componentId}`
+                        );
+
+                    if (recommendationText) {
+
+                        recommendationText.textContent =
+                            `★ Jumlah rekomendasi sistem untuk ${multiplier} bundling : ${
+                    originalQty * multiplier
+                }`;
+
+                    }
+
+                });
+
+            }
+
+            bundleInput.addEventListener(
+                'input',
+                updateBundleQuantity
+            );
             const mainSelect = findMainProductSelect();
 
             if (mainSelect) {

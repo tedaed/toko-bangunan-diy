@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('invoice_number')->unique();
             $table->string('customer_name');
             $table->string('phone');
-            // $table->string('payment_method')->default('QRIS');
+            $table->string('payment_method')->default('QRIS');
             $table->integer('total_price')->default(0);
             $table->string('status')->default('pending');
             $table->text('note')->nullable();

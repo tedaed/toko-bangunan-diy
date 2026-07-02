@@ -75,12 +75,15 @@ class CheckoutController extends Controller
             'customer_name' => 'required|string|max:255',
             'phone' => ['required', 'regex:/^[0-9]{10,15}$/'],
             'payment_method' => 'required|string|max:50',
+            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'note' => 'nullable|string',
         ], [
             'customer_name.required' => 'Nama pelanggan wajib diisi.',
             'phone.required' => 'Nomor WhatsApp wajib diisi.',
             'phone.regex' => 'Nomor WhatsApp harus berupa angka 10 sampai 15 digit.',
             'payment_method.required' => 'Metode pembayaran wajib dipilih.',
+            'payment_proof.required' => 'Bukti pembayaran DP wajib diunggah sebelum invoice dibuat.',
+            'payment_proof.image' => 'Bukti pembayaran harus berupa gambar.',
         ]);
 
         $checkout = session('checkout');
@@ -124,9 +127,14 @@ class CheckoutController extends Controller
         }
 
         $total = $items->sum('subtotal');
+        $dpAmount = (int) ceil($total * 0.3);
 
-        $order = DB::transaction(function () use ($validated, $items, $total) {
+        $paymentProofPath = $request->file('payment_proof')
+            ->store('payment-proofs', 'public');
+
+        $order = DB::transaction(function () use ($validated, $items, $total, $dpAmount, $paymentProofPath) {
             $order = Order::create([
+
                 'user_id' => Auth::id(),
                 'invoice_number' => 'INV-' . now()->format('YmdHis'),
                 'customer_name' => $validated['customer_name'],
@@ -135,6 +143,10 @@ class CheckoutController extends Controller
                 'total_price' => $total,
                 'status' => 'pending',
                 'note' => $validated['note'] ?? null,
+                'dp_amount' => $dpAmount,
+                'payment_proof' => $paymentProofPath,
+                'payment_status' => 'dp_uploaded',
+                'dp_expired_at' => now()->addHours(24),
             ]);
 
             foreach ($items as $item) {

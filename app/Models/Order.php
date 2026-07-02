@@ -17,9 +17,14 @@ class Order extends Model
         'status_note',
         'stock_reduced_at',
         'note',
+        'dp_amount',
+        'payment_proof',
+        'payment_status',
+        'dp_expired_at',
     ];
     protected $casts = [
         'stock_reduced_at' => 'datetime',
+        'dp_expired_at' => 'datetime',
     ];
 
     public function items()

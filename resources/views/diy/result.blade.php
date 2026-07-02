@@ -12,7 +12,30 @@
     <div class="max-w-4xl mx-auto px-6 py-10">
         <div class="bg-white rounded-xl shadow p-6">
 
-            <h2 class="text-2xl font-bold mb-6">Rincian Belanja</h2>
+            <h2 class="text-2xl font-bold mb-4">
+                Rincian Belanja
+            </h2>
+
+            @php
+                $bundleQty = request('bundle_quantity', 1);
+            @endphp
+
+            <div class="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+
+                <p class="font-semibold">
+                    Jumlah Bundling :
+                    <span class="text-blue-700">
+                        {{ $bundleQty }}
+                    </span>
+                </p>
+
+                <p class="text-sm text-gray-600 mt-1">
+                    Seluruh jumlah komponen dan estimasi harga dihitung berdasarkan
+                    {{ $bundleQty }}
+                    bundling proyek DIY.
+                </p>
+
+            </div>
 
             @if (!empty($ruleBasedResult) && !empty($ruleBasedResult['rules']))
                 <div class="mb-6 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded">
@@ -83,7 +106,7 @@
                                 </p>
                             @endif
 
-                            
+
                             @if (!empty($item['minimum_rule_quantity']))
                                 <p class="text-sm text-gray-600 mt-1">
                                     Jumlah yang direkomendasikan sistem:

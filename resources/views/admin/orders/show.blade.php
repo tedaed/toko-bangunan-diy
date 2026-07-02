@@ -57,6 +57,19 @@
                     <p class="text-gray-500">Metode Pembayaran</p>
                     <p class="font-bold">{{ $order->payment_method }}</p>
                 </div>
+                <div>
+                    <p class="text-gray-500">DP Dibayar</p>
+                    <p class="font-bold">
+                        Rp {{ number_format($order->dp_amount, 0, ',', '.') }}
+                    </p>
+                </div>
+
+                <div>
+                    <p class="text-gray-500">Batas Pembayaran DP</p>
+                    <p class="font-bold">
+                        {{ $order->dp_expired_at ? $order->dp_expired_at->format('d-m-Y H:i') : '-' }}
+                    </p>
+                </div>
 
                 <div>
                     <p class="text-gray-500">Stok Dikurangi</p>
@@ -65,6 +78,17 @@
                     </p>
                 </div>
             </div>
+
+            @if ($order->payment_proof)
+                <div class="mb-6 bg-blue-50 border border-blue-200 p-4 rounded">
+                    <p class="font-bold mb-2">Bukti Pembayaran DP</p>
+
+                    <a href="{{ asset('storage/' . $order->payment_proof) }}" target="_blank">
+                        <img src="{{ asset('storage/' . $order->payment_proof) }}" alt="Bukti Pembayaran DP"
+                            class="max-w-xs border rounded">
+                    </a>
+                </div>
+            @endif
 
             <table class="w-full border-collapse">
                 <thead>
@@ -199,4 +223,3 @@
     </div>
 
 @endsection
-    

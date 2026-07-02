@@ -13,7 +13,7 @@
             <div class="lg:col-span-2 bg-white rounded-xl shadow p-6">
                 <h2 class="text-xl font-bold mb-4">Data Pelanggan</h2>
 
-                <form action="{{ route('checkout.store') }}" method="POST">
+                <form action="{{ route('checkout.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-4">
@@ -31,14 +31,14 @@
                     <div class="mb-4">
                         <label class="block font-semibold mb-1">
                             Nomor WhatsApp <span class="text-red-600">*</span>
-                            </label>
+                        </label>
 
-                            <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="numeric"
-                                pattern="[0-9]{10,15}" class="w-full border rounded p-2" placeholder="Contoh: 081234567890">
+                        <input type="tel" name="phone" value="{{ old('phone') }}" inputmode="numeric"
+                            pattern="[0-9]{10,15}" class="w-full border rounded p-2" placeholder="Contoh: 081234567890">
 
-                            @error('phone')
-                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                        @error('phone')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="mb-4">
@@ -46,7 +46,7 @@
                             Metode Pembayaran <span class="text-red-600">*</span>
                         </label>
                         <select name="payment_method" class="w-full border rounded p-2">
-                            {{-- <option value="QRIS">QRIS</option> --}}
+                            <option value="QRIS">QRIS</option>
                             <option value="Bayar di Toko">Bayar di Toko</option>
                         </select>
                     </div>
@@ -57,6 +57,46 @@
                             placeholder="Contoh: Tolong siapkan barang untuk diambil sore hari">{{ old('note') }}</textarea>
                     </div>
 
+                    @php
+                        $dpAmount = (int) ceil($total * 0.3);
+                    @endphp
+
+                    <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="font-bold text-lg mb-2">Pembayaran DP</h3>
+
+                        <p class="text-sm text-gray-700">
+                            Total Pesanan:
+                            <span class="font-bold">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                        </p>
+
+                        <p class="text-sm text-gray-700">
+                            DP 30%:
+                            <span class="font-bold text-blue-700">Rp {{ number_format($dpAmount, 0, ',', '.') }}</span>
+                        </p>
+
+                        <p class="text-sm text-red-600 mt-2">
+                            Pesanan akan hangus apabila DP belum dibayarkan dalam waktu 24 jam.
+                        </p>
+
+                        <div class="mt-4">
+                            <p class="font-semibold mb-2">Scan QRIS Toko:</p>
+                            <img src="{{ asset('storage/images/qris-toko.png') }}" alt="QRIS Toko"
+                                class="w-48 border rounded bg-white p-2">
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block font-semibold mb-1">
+                                Upload Bukti Pembayaran DP <span class="text-red-600">*</span>
+                            </label>
+
+                            <input type="file" name="payment_proof" accept="image/*" required
+                                class="w-full border rounded p-2 bg-white">
+
+                            @error('payment_proof')
+                                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
                     <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded font-bold hover:bg-green-700">
                         Buat Invoice
                     </button>
